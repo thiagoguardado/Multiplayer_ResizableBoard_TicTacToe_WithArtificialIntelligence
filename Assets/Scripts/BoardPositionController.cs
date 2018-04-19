@@ -32,7 +32,8 @@ public class BoardPositionController : MonoBehaviour {
 
     private void OnMouseDown()
     {
-        m_boardManager.AddPlayerToBoard(index);
+        if (GameManager.playerCanInteract)
+            m_boardManager.AddPlayerToBoard(index);
 
     }
 

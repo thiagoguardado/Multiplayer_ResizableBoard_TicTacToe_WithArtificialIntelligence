@@ -30,7 +30,7 @@ public class BoardView : MonoBehaviour {
     {
         for (int i = 0; i < transform.childCount; i++)
         {
-            switch (m_boardManager.board[i])
+            switch (m_boardManager.Board.FullBoard[i])
             {
                 case Player.None:
                     m_boardPositions[i].ResetSprite();

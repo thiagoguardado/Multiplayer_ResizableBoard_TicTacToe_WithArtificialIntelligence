@@ -33,8 +33,11 @@ public class BoardPositionController : MonoBehaviour {
     private void OnMouseDown()
     {
         if (GameManager.playerCanInteract)
-            m_boardManager.AddPlayerToBoard(index);
 
+            if (m_boardManager.Board.CurrentPlayer.playerType == PlayerType.Human)
+            {
+                m_boardManager.AddPlayerToBoard(index);
+            }
     }
 
 }

@@ -1,125 +1,290 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
-public class IAManager : MonoBehaviour {
-    
-    private Player m_IAPlayer = Player.Cross;
-    public BoardManager boardManager;
-    private int bestIndex;
+public class IAManager: MonoBehaviour {
 
-    public void FindBestMovement() {
+    public enum MinimaxType
+    {
+        Classic,
+        AlphaBeta
+    }
 
-        List<int> empty = boardManager.Board.FindEmptyPositions();
+    private List<int> emptyPositions;
+    private Board board;
 
-        if (empty.Count > 0)
+    private GamePlayer m_gamePlayer;
+    private MinimaxType m_minimaxType;
+    private BoardManager m_boardManager;
+    private int m_maxDepth;
+
+    private float waitingTimeBeforePlay = 0.5f;
+    private float waitingTime;
+    private bool isWaiting;
+    private bool finishedCalculation;
+    private int moveIndex;
+    GamePlayer m_minimaxWinningSymbol;
+    Thread t;
+
+    public void Initialize(BoardManager _boardManager, GamePlayer _player, MinimaxType minimaxType, int maxDepth)
+    {
+        m_boardManager = _boardManager;
+        m_gamePlayer = _player;
+        m_minimaxType = minimaxType;
+        m_maxDepth = maxDepth;
+    }
+
+    private void OnDisable()
+    {
+        t.Abort();
+    }
+
+    private void Update()
+    {
+
+        if (isWaiting)
         {
-
-            // clone board
-            Board clonedBoard = new Board(boardManager.Board);
-
-            bestIndex = -1;
-
-            MiniMax(clonedBoard, m_IAPlayer);
-
-            Debug.Log("Best IA Movement: " + bestIndex.ToString());
-
-            if (bestIndex == -1)
+            if (waitingTime >= waitingTimeBeforePlay)
             {
-                boardManager.AddPlayerToBoard(empty[UnityEngine.Random.Range(0, empty.Count)]);
+                if (finishedCalculation)
+                {
+                    m_boardManager.AddPlayerToBoard(moveIndex);
+                    isWaiting = false;
+                    return;
+                }
             }
             else
             {
-                boardManager.AddPlayerToBoard(bestIndex);
+                waitingTime += Time.deltaTime;
+                return;
             }
 
-        }
-
-    }
-
-    private int MiniMax(Board board, Player currentPlayer)
-    {
-
-        GameResult gameResult = board.CheckEndGame();
-
-        if (gameResult != GameResult.None)
-        {
-            return CalculateScore(gameResult);
         }
         else
         {
-            
-            int val = 0;
-            Player nextplayer = currentPlayer == Player.Circle ? Player.Cross : Player.Circle;
-
-            if (currentPlayer != m_IAPlayer)
+            if (m_boardManager.Board.CurrentPlayer == m_gamePlayer && m_boardManager.CurrentResult == GameResult.None)
             {
-                val = 999999;
-                foreach (int index in board.FindEmptyPositions())
-                {
-                    Board nextBoard = new Board(board);
-                    nextBoard.AddPlayerToBoard(index,currentPlayer);
-
-                    int indexval = MiniMax(nextBoard, nextplayer);
-                    if (indexval < val || (indexval == val && (UnityEngine.Random.value > 0.5f)))
-                    {
-                        val = indexval;
-                        bestIndex = index;
-                    }
-                    
-
-                }
+                waitingTime = 0;
+                isWaiting = true;
+                finishedCalculation = false;
+                emptyPositions = m_boardManager.Board.FindEmptyPositions();
+                emptyPositions = ShuffleList<int>(emptyPositions);
+                t = new Thread(this.FindBestMovement);
+                t.Start();
             }
-            else
-            {
-                val = -999999;
-                foreach (int index in board.FindEmptyPositions())
-                {
-                    Board nextBoard = new Board(board);
-                    nextBoard.AddPlayerToBoard(index, currentPlayer);
-                    int indexval = MiniMax(nextBoard, nextplayer);
-                    if (indexval > val || (indexval == val && (UnityEngine.Random.value > 0.5f)))
-                    {
-                        val = indexval;
-                        bestIndex = index;
-                    }
-
-                }
-
-            }
-            return val;
         }
-
     }
 
-    private void LogMinimaxCalc(Board nextBoard)
-    {
-        string s = "";
-        foreach (var item in nextBoard.FullBoard.ToArray())
+    public void FindBestMovement() {
+
+        if (emptyPositions.Count > 0)
         {
-            s += item.ToString() + " ";
+           
+            switch (m_minimaxType)
+            {
+                case MinimaxType.Classic:
+                    moveIndex = 0;
+                    board = new Board(m_boardManager.Board);
+                    MinimaxClassic(true, out moveIndex, m_maxDepth);
+                    break;
+                case MinimaxType.AlphaBeta:
+                    moveIndex = 0;
+                    board = new Board(m_boardManager.Board);
+                    MinimaxAlphaBeta(true, out moveIndex,-999999,999999, m_maxDepth);
+                    break;
+                default:
+                    break;
+            }
         }
-        Debug.Log(s);
-        Debug.Log("Best index in depth " + (nextBoard.FindEmptyPositions().Count + 1).ToString() + ": " + bestIndex.ToString());
+
+        finishedCalculation = true;
 
     }
 
-    private int CalculateScore(GameResult gameResult) {
+    private List<T> ShuffleList<T>(List<T> list)
+    {
+        //randomize list
+        for (int i = 0; i < list.Count; i++)
+        {
+            int j = UnityEngine.Random.Range(0, list.Count);
+            T temp = list[j];
+            list[j] = list[i];
+            list[i] = temp;
+        }
+
+        return list;
+    }
+
+    private int MinimaxClassic(bool isMax, out int positionIndex,int depth)
+    {
+        positionIndex = 0;
+
+
+        GameResult result = board.CheckEndGame(out m_minimaxWinningSymbol);
+        if (result != GameResult.None || depth <= 0)
+        {
+            return CalculateScore(result, m_minimaxWinningSymbol);
+        }
+
+        GamePlayer minimaxCurrentPlayer = board.CurrentPlayer;
+        int testIndex;
+        int branchValue;
+        int lastpositionIndex;
+        int bestValue;
+
+        if (isMax)
+        {
+            bestValue = -999999;
+
+            for (int i = 0; i < emptyPositions.Count; i++)
+            {
+                lastpositionIndex = positionIndex;
+                testIndex = emptyPositions[i];
+                board.AddPlayerToBoard(testIndex, board.CurrentPlayer);
+                emptyPositions.RemoveAt(i);
+                branchValue = MinimaxClassic(false, out positionIndex,depth-1);
+                emptyPositions.Insert(i, testIndex);
+                board.RemovePlayerFromBoard(testIndex);
+                board.SetPlayer(minimaxCurrentPlayer);
+                positionIndex = lastpositionIndex;
+
+                if (branchValue >= bestValue)
+                {
+                    positionIndex = emptyPositions[i];
+                    bestValue = branchValue;
+                }
+            }
+        }
+        else
+        {
+            bestValue = 999999;
+
+            for (int i = 0; i < emptyPositions.Count; i++)
+            {
+                lastpositionIndex = positionIndex;
+                testIndex = emptyPositions[i];
+                board.AddPlayerToBoard(testIndex, board.CurrentPlayer);
+                emptyPositions.RemoveAt(i);
+                branchValue = MinimaxClassic(true, out positionIndex,depth-1);
+                emptyPositions.Insert(i, testIndex);
+                board.RemovePlayerFromBoard(testIndex);
+                board.SetPlayer(minimaxCurrentPlayer);
+                positionIndex = lastpositionIndex;
+
+                if (branchValue <= bestValue)
+                {
+                    positionIndex = testIndex;
+                    bestValue = branchValue;
+                }
+            }
+
+        }
+
+        return bestValue;
+
+    }
+
+    private int MinimaxAlphaBeta(bool isMax, out int positionIndex, int alpha, int beta,int depth)
+    {
+        positionIndex = 0;
+
+        GameResult result = board.CheckEndGame(out m_minimaxWinningSymbol);
+        if (result != GameResult.None || depth <=0)
+        {
+            return CalculateScore(result, m_minimaxWinningSymbol);
+        }
+
+        GamePlayer m_minimaxCurrentPlayer = board.CurrentPlayer;
+        int testIndex;
+        int branchValue;
+        int lastpositionIndex;
+        int bestValue;
+
+        if (isMax)
+        {
+
+            bestValue = -999999;
+
+            for (int i = 0; i < emptyPositions.Count; i++)
+            {
+                lastpositionIndex = positionIndex;
+                testIndex = emptyPositions[i];
+                board.AddPlayerToBoard(testIndex, board.CurrentPlayer);
+                emptyPositions.RemoveAt(i);
+                branchValue = MinimaxAlphaBeta(false, out positionIndex, alpha, beta,depth-1);
+                emptyPositions.Insert(i, testIndex);
+                board.RemovePlayerFromBoard(testIndex);
+                board.SetPlayer(m_minimaxCurrentPlayer);
+                positionIndex = lastpositionIndex;
+
+                if (branchValue >= bestValue)
+                {
+                    positionIndex = testIndex;
+                    bestValue = branchValue;
+
+
+                    alpha = Mathf.Max(alpha, bestValue);
+                    if (beta < alpha)
+                    {
+                        //positionIndex = testIndex;
+                        break;
+                    }
+
+                }
+
+
+            }
+        }
+        else
+        {
+
+            bestValue = 999999;
+
+            for (int i = 0; i < emptyPositions.Count; i++)
+            {
+                lastpositionIndex = positionIndex;
+                testIndex = emptyPositions[i];
+                board.AddPlayerToBoard(testIndex, board.CurrentPlayer);
+                emptyPositions.RemoveAt(i);
+                branchValue = MinimaxAlphaBeta(true, out positionIndex, alpha, beta,depth-1);
+                emptyPositions.Insert(i, testIndex);
+                board.RemovePlayerFromBoard(testIndex);
+                board.SetPlayer(m_minimaxCurrentPlayer);
+                positionIndex = lastpositionIndex;
+
+                if (branchValue <= bestValue)
+                {
+                    positionIndex = testIndex;
+                    bestValue = branchValue;
+
+                    beta = Mathf.Min(beta, bestValue);
+                    if (beta < alpha)
+                    {
+                        //positionIndex = testIndex;
+                        break;
+                    }
+
+                }
+
+
+
+            }
+
+        }
+
+        return bestValue;
+
+    }
+
+
+    private int CalculateScore(GameResult gameResult, GamePlayer winningPlayer) {
 
         switch (gameResult)
         {
-            case GameResult.CircleWin:
-                if (m_IAPlayer == Player.Circle)
-                {
-                    return 1;
-                }
-                else
-                {
-                    return -1;
-                }
-            case GameResult.CrossWin:
-                if (m_IAPlayer == Player.Cross)
+            case GameResult.PlayerWin:
+                if (winningPlayer == m_gamePlayer)
                 {
                     return 1;
                 }
@@ -132,7 +297,10 @@ public class IAManager : MonoBehaviour {
             default:
                 return 0;
         }
-       
+
+ 
+
+
     }
 
 }

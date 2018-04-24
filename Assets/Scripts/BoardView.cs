@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,9 +25,18 @@ public class BoardView : MonoBehaviour {
         m_boardManager = boardManager;
         CreateGrid(size);
         CreatePositions(size);
+        ChangeSize(size);
         GetControllers();
     }
 
+    private void ChangeSize(int size)
+    {
+        if (size > 3)
+        {
+           transform.localScale = Vector3.one * (1 - ((float)size - 3)/(float)size);
+        }
+
+    }
 
     private void CreateGrid(int size) {
 
@@ -37,11 +47,28 @@ public class BoardView : MonoBehaviour {
             // horizontal
             go = Instantiate(gridLinePrefab, new Vector3(0, i*2 - (size-2) , 0), Quaternion.identity,gridParent);
             go.transform.localScale = Vector3.one * size;
+            go.GetComponent<LineRenderer>().widthMultiplier = 0.25f * (1 - ((float)size - 3) / (float)size);
 
             // vertical
             go = Instantiate(gridLinePrefab, new Vector3(i * 2 - (size - 2),0, 0), Quaternion.Euler(0,0,90), gridParent);
             go.transform.localScale = Vector3.one * size;
+            go.GetComponent<LineRenderer>().widthMultiplier = 0.25f * (1 - ((float)size - 3) / (float)size);
         }
+
+
+        //outer borders
+
+        List<GameObject> l = new List<GameObject>();
+        l.Add(Instantiate(gridLinePrefab, new Vector3(0, (size - 1) * 2 - (size - 3), 0), Quaternion.identity, gridParent));
+        l.Add(Instantiate(gridLinePrefab, new Vector3(0, (-2) * 2  - (size - 3), 0), Quaternion.identity, gridParent));
+        l.Add(Instantiate(gridLinePrefab, new Vector3((-2) * 2 - (size - 3), 0, 0), Quaternion.Euler(0, 0, 90), gridParent));
+        l.Add(Instantiate(gridLinePrefab, new Vector3((size - 1) * 2 - (size - 3), 0, 0), Quaternion.Euler(0, 0, 90), gridParent));
+
+        for (int i = 0; i < l.Count; i++)
+        {
+            l[i].transform.localScale = Vector3.one * (size + 1);
+        }
+
 
     }
 

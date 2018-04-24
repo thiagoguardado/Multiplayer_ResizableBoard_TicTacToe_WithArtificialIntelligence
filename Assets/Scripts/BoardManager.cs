@@ -22,8 +22,15 @@ public enum PlayerType
     AI
 }
 
+public enum WinningCheck
+{
+    Full,
+    MaxWidth
+}
 
 public class BoardManager : MonoBehaviour {
+
+    public static BoardManager Instance;
 
     public int boardSize = 3;
 
@@ -36,7 +43,8 @@ public class BoardManager : MonoBehaviour {
         }
     }
 
-
+    public int maxLineWidth;
+    public WinningCheck winningCheck;
 
     public List<GamePlayer> players = new List<GamePlayer>();
 
@@ -60,8 +68,11 @@ public class BoardManager : MonoBehaviour {
 
     private void Awake() {
 
+        //Singleton
+        Instance = this;
+
         // create board
-        m_board = new Board(boardSize, players);
+        m_board = new Board(boardSize, players, winningCheck, maxLineWidth);
 
         m_boardView = GetComponent<BoardView>();
 
@@ -175,6 +186,7 @@ public class BoardManager : MonoBehaviour {
 
 public struct Board
 {
+
     private int m_size;
     public int Size
     {
@@ -202,8 +214,11 @@ public struct Board
         }
     }
 
+    private WinningCheck m_winningCheck;
+    private int m_maxWidth;
+
     // constructor
-    public Board(int size, List<GamePlayer> _players)
+    public Board(int size, List<GamePlayer> _players, WinningCheck _winningCheck, int _maxWidth)
     {
         // create board
         m_size = size;
@@ -215,6 +230,8 @@ public struct Board
 
         players = _players;
         currentPlayer = _players[0];
+        m_maxWidth = _maxWidth;
+        m_winningCheck = _winningCheck;
 
     }
 
@@ -228,6 +245,8 @@ public struct Board
         }
         players = referenceBoard.players;
         currentPlayer = referenceBoard.currentPlayer;
+        m_maxWidth = referenceBoard.m_maxWidth;
+        m_winningCheck = referenceBoard.m_winningCheck;
     }
 
     private GamePlayer PlayerAtBoardPosition(int i)
@@ -294,7 +313,21 @@ public struct Board
     {
         winningPlayerSymbol = null;
 
-        GamePlayer playerWon = CheckWinning();
+        GamePlayer playerWon;
+
+        switch (m_winningCheck)
+        {
+            case WinningCheck.Full:
+                playerWon = CheckWinning();
+                break;
+            case WinningCheck.MaxWidth:
+                playerWon = CheckWinningMaxWidth();
+                break;
+            default:
+                playerWon = CheckWinning();
+                break;
+        }
+
 
         // check tie
         if (playerWon == null)
@@ -335,6 +368,40 @@ public struct Board
 
                     // check diagonal 2
                     playerWon = CheckDiagonal2();
+
+                }
+
+            }
+
+
+        }
+
+        return playerWon;
+    }
+
+    private GamePlayer CheckWinningMaxWidth()
+    {
+
+        // check lines
+        GamePlayer playerWon = CheckLinesMaxWidth(m_maxWidth);
+
+        if (playerWon == null)
+        {
+
+            // check columns
+            playerWon = CheckColumnsMaxWidth(m_maxWidth);
+
+            if (playerWon == null)
+            {
+
+                // check diagonal 1
+                playerWon = CheckDiagonal1MaxWidth(m_maxWidth);
+
+                if (playerWon == null)
+                {
+
+                    // check diagonal 2
+                    playerWon = CheckDiagonal2MaxWidth(m_maxWidth);
 
                 }
 
@@ -402,6 +469,58 @@ public struct Board
         return null;
     }
 
+    private GamePlayer CheckLinesMaxWidth(int maxWidth)
+    {
+        GamePlayer p;
+        bool different = false;
+
+        for (int i = 0; i < m_size; i++)
+        {
+            for (int j = 0; j < (m_size - maxWidth + 1); j++)
+            {
+
+                different = false;
+
+                p = m_fullBoard[(i * m_size) + j];
+
+                if (p != null)
+                {
+
+                    for (int k = 1; k < maxWidth; k++)
+                    {
+                        if (m_fullBoard[(i * m_size) + j + k] == null)
+                        {
+                            different = true;
+                            break;
+                        }
+                        else
+                        {
+                            if (m_fullBoard[(i * m_size) + j + k].playerSymbol != p.playerSymbol)
+                            {
+                                different = true;
+                                break;
+                            }
+                        }
+
+
+                    }
+
+                    if (!different)
+                    {
+                        return p;
+                    }
+
+
+                }
+
+            }
+
+        }
+
+        return null;
+    }
+
+
     private GamePlayer CheckColumns()
     {
         GamePlayer p;
@@ -442,6 +561,58 @@ public struct Board
         return null;
     }
 
+    private GamePlayer CheckColumnsMaxWidth(int maxWidth)
+    {
+        GamePlayer p;
+        bool different = false;
+
+        for (int i = 0; i < m_size; i++)
+        {
+            for (int j = 0; j < (m_size - maxWidth + 1); j++)
+            {
+
+                different = false;
+
+                p = m_fullBoard[i + (j * m_size)];
+
+                if (p != null)
+                {
+
+                    for (int k = 1; k < maxWidth; k++)
+                    {
+                        if (m_fullBoard[i + ((j + k) * m_size)] == null)
+                        {
+                            different = true;
+                            break;
+                        }
+                        else
+                        {
+                            if (m_fullBoard[i + ((j + k) * m_size)].playerSymbol != p.playerSymbol)
+                            {
+                                different = true;
+                                break;
+                            }
+                        }
+
+
+                    }
+
+                    if (!different)
+                    {
+                        return p;
+                    }
+
+
+                }
+
+            }
+
+        }
+
+        return null;
+    }
+
+
     private GamePlayer CheckDiagonal1()
     {
         GamePlayer p;
@@ -470,6 +641,59 @@ public struct Board
         }
 
         return p;
+    }
+
+    private GamePlayer CheckDiagonal1MaxWidth(int maxWidth)
+    {
+
+        GamePlayer p;
+        bool diferent = false;
+
+        for (int i = 0; i < (m_size - maxWidth + 1); i++)
+        {
+
+            for (int l = 0; l < (m_size - maxWidth + 1); l++)
+            {
+
+                p = m_fullBoard[(i * m_size) + l];
+
+                if (p == null)
+                {
+                    continue;
+                }
+                else
+                {
+                    diferent = false;
+                    for (int k = 1; k < maxWidth; k++)
+                    {
+                        GamePlayer gp = m_fullBoard[((i+k) * m_size) + (l + k)];
+                        if (gp == null)
+                        {
+                            diferent = true;
+                            break;
+                        }
+                        else
+                        {
+                            if (gp.playerSprite != p.playerSprite)
+                            {
+                                diferent = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!diferent)
+                    {
+                        return p;
+                    }
+                    
+                }
+
+            }
+
+        }
+
+        return null;
     }
 
     private GamePlayer CheckDiagonal2()
@@ -502,7 +726,61 @@ public struct Board
         return p;
     }
 
+    private GamePlayer CheckDiagonal2MaxWidth(int maxWidth)
+    {
 
+        GamePlayer p;
+        bool diferent = false;
+
+        for (int i = 0; i < (m_size - maxWidth + 1); i++)
+        {
+
+            for (int l = (m_size - 1); l > (m_size - maxWidth - 1); l--)
+            {
+
+                p = m_fullBoard[(i * m_size) + l];
+
+                if (p == null)
+                {
+                    continue;
+                }
+                else
+                {
+
+                    diferent = false;
+                    for (int k = 1; k < maxWidth; k++)
+                    {
+                        GamePlayer gp = m_fullBoard[((i + k) * m_size) + (l - k)]; ;
+                        if (gp == null)
+                        {
+                            diferent = true;
+                            break;
+                        }
+                        else
+                        {
+                            if (gp.playerSprite != p.playerSprite)
+                            {
+                                diferent = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!diferent)
+                    {
+                        return p;
+                    }
+                }
+
+            }
+
+        }
+
+        return null;
+    }
+
+
+   
 
 }
 

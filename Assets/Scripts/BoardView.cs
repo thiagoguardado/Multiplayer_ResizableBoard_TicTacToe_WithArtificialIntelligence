@@ -33,9 +33,9 @@ public class BoardView : MonoBehaviour {
     {
         if (size > 3)
         {
-           transform.localScale = Vector3.one * (1 - ((float)size - 3)/(float)size);
+           transform.localScale = Vector3.one * (1 - ((float)size - 3)/((float)size));
         }
-
+        
     }
 
     private void CreateGrid(int size) {
@@ -59,14 +59,14 @@ public class BoardView : MonoBehaviour {
         //outer borders
 
         List<GameObject> l = new List<GameObject>();
-        l.Add(Instantiate(gridLinePrefab, new Vector3(0, (size - 1) * 2 - (size - 3), 0), Quaternion.identity, gridParent));
-        l.Add(Instantiate(gridLinePrefab, new Vector3(0, (-2) * 2  - (size - 3), 0), Quaternion.identity, gridParent));
-        l.Add(Instantiate(gridLinePrefab, new Vector3((-2) * 2 - (size - 3), 0, 0), Quaternion.Euler(0, 0, 90), gridParent));
-        l.Add(Instantiate(gridLinePrefab, new Vector3((size - 1) * 2 - (size - 3), 0, 0), Quaternion.Euler(0, 0, 90), gridParent));
+        l.Add(Instantiate(gridLinePrefab, new Vector3(0, (size - 0.5f) * 2 - (size - 2), 0), Quaternion.identity, gridParent));
+        l.Add(Instantiate(gridLinePrefab, new Vector3(0, (-1.5f) * 2  - (size - 2), 0), Quaternion.identity, gridParent));
+        l.Add(Instantiate(gridLinePrefab, new Vector3((-1.5f) * 2 - (size - 2), 0, 0), Quaternion.Euler(0, 0, 90), gridParent));
+        l.Add(Instantiate(gridLinePrefab, new Vector3((size - 0.5f) * 2 - (size - 2), 0, 0), Quaternion.Euler(0, 0, 90), gridParent));
 
         for (int i = 0; i < l.Count; i++)
         {
-            l[i].transform.localScale = Vector3.one * (size + 1);
+            l[i].transform.localScale = Vector3.one * (size + 1f);
         }
 
 

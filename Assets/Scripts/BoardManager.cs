@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum PlayerSymbol
 {
@@ -71,6 +72,9 @@ public class BoardManager : MonoBehaviour {
         //Singleton
         Instance = this;
 
+        // load setup
+        LoadSetup();
+
         // create board
         m_board = new Board(boardSize, players, winningCheck, maxLineWidth);
 
@@ -78,6 +82,7 @@ public class BoardManager : MonoBehaviour {
 
         // initialize view
         m_boardView.Initialize(this, boardSize);
+
 
         // initialize IA
         for (int i = 0; i < players.Count; i++)
@@ -96,7 +101,34 @@ public class BoardManager : MonoBehaviour {
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 Reset();
+                ReturnToMenu();
             }
+
+        }
+    }
+
+    private void ReturnToMenu()
+    {
+        SceneManager.LoadScene("GameSelection");
+    }
+
+    private void LoadSetup()
+    {
+        if (GameManager.Instance != null)
+        {
+            boardSize = GameManager.boardSize;
+
+            players.Clear();
+
+            for (int i = 0; i < GameManager.players.Count; i++)
+            {
+                Player p = GameManager.players[i];
+                players.Add(new GamePlayer(p.playerSymbolAndSprite.playerSymbol, p.playerType, p.playerSymbolAndSprite.playerSprite, p.color));
+
+            }
+
+
+            maxMinimaxDepth = MaxAcceptableDepth(boardSize);
 
         }
     }
@@ -167,10 +199,10 @@ public class BoardManager : MonoBehaviour {
             case GameResult.None:
                 break;
             case GameResult.PlayerWin:
-                Debug.Log(winningPlayer.playerName + " wins");
+                PlayerWin();
                 break;
             case GameResult.TicTacToe:
-                Debug.Log("Tie");
+                Tie();
                 break;
             default:
                 break;
@@ -178,8 +210,39 @@ public class BoardManager : MonoBehaviour {
 
     }
 
+    private void PlayerWin()
+    {
+        Debug.Log(winningPlayer.playerSymbol.ToString() + " wins");
+        m_boardView.PlayerWin(winningPlayer);
+    }
+
+    private void Tie()
+    {
+        m_boardView.Tie();
+        Debug.Log("Tie!");
+    }
 
 
+    private int MaxAcceptableDepth(int boardSize)
+    {
+        switch (boardSize)
+        {
+            case 3:
+                return 8;
+            case 4:
+                return 5;
+            case 5:
+                return 4;
+            case 6:
+                return 3;
+            case 7:
+            case 8:
+            case 9:
+                return 2;
+            default:
+                return 1;
+        }
+    }
 
 
 }
@@ -780,14 +843,11 @@ public struct Board
     }
 
 
-   
-
 }
 
 [System.Serializable]
 public class GamePlayer
 {
-    public string playerName;
     public PlayerSymbol playerSymbol;
     public PlayerType playerType;
     public PlayerSprite playerSprite;
@@ -796,10 +856,18 @@ public class GamePlayer
     {
         if (reference != null)
         {
-            playerName = reference.playerName;
             playerSymbol = reference.playerSymbol;
             playerType = reference.playerType;
             playerSprite = reference.playerSprite;
         }
     }
+
+    public GamePlayer(PlayerSymbol playerSymbol, PlayerType playerType, Sprite sprite, Color color)
+    {
+        this.playerSymbol = playerSymbol;
+        this.playerType = playerType;
+        this.playerSprite = new PlayerSprite(sprite, color);
+    }
+
+
 }

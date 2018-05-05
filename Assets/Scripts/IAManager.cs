@@ -27,6 +27,7 @@ public class IAManager: MonoBehaviour {
     private int moveIndex;
     GamePlayer m_minimaxWinningSymbol;
     Thread t;
+    bool threadRunning;
 
     public void Initialize(BoardManager _boardManager, GamePlayer _player, MinimaxType minimaxType, int maxDepth)
     {
@@ -38,7 +39,8 @@ public class IAManager: MonoBehaviour {
 
     private void OnDisable()
     {
-        t.Abort();
+        threadRunning = false;
+        
     }
 
     private void Update()
@@ -71,6 +73,7 @@ public class IAManager: MonoBehaviour {
                 finishedCalculation = false;
                 emptyPositions = m_boardManager.Board.FindEmptyPositions();
                 emptyPositions = ShuffleList<int>(emptyPositions);
+                threadRunning = true;
                 t = new Thread(this.FindBestMovement);
                 t.Start();
             }
@@ -121,6 +124,10 @@ public class IAManager: MonoBehaviour {
     {
         positionIndex = 0;
 
+        if (!threadRunning)
+        {
+            return 0;
+        }
 
         GameResult result = board.CheckEndGame(out m_minimaxWinningSymbol);
         if (result != GameResult.None || depth <= 0)
@@ -189,6 +196,11 @@ public class IAManager: MonoBehaviour {
     private int MinimaxAlphaBeta(bool isMax, out int positionIndex, int alpha, int beta,int depth)
     {
         positionIndex = 0;
+
+        if (!threadRunning)
+        {
+            return 0;
+        }
 
         GameResult result = board.CheckEndGame(out m_minimaxWinningSymbol);
         if (result != GameResult.None || depth <=0)

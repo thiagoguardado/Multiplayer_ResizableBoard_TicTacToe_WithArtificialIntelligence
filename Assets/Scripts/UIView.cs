@@ -8,12 +8,29 @@ public class UIView : MonoBehaviour {
 
     private PlayerSprite currentPlayer;
     public Image nextPlayerImage;
+    public Image playerWinImage;
+
+    public GameObject nextPlayerPanel;
+    public GameObject playerWinPanel;
+    public GameObject tiePanel;
+
+    private bool updatingNextPlayer;
 
 
-	// Update is called once per frame
+    void Awake()
+    {
+        updatingNextPlayer = true;
+        nextPlayerPanel.SetActive(true);
+        playerWinPanel.SetActive(false);
+        tiePanel.SetActive(false);
+    }
+
 	void Update () {
 
-        ChangeNextPlayer();
+        if (updatingNextPlayer)
+        {
+            ChangeNextPlayer();
+        }
 
 	}
 
@@ -28,4 +45,26 @@ public class UIView : MonoBehaviour {
         }
 
     }
+
+
+
+    public void PlayerWin(GamePlayer winningPlayer) {
+
+        nextPlayerPanel.SetActive(false);
+        playerWinPanel.SetActive(true);
+        tiePanel.SetActive(false);
+
+        playerWinImage.sprite = winningPlayer.playerSprite.sprite;
+        playerWinImage.color = winningPlayer.playerSprite.color;
+
+    }
+
+    public void Tie()
+    {
+
+        nextPlayerPanel.SetActive(false);
+        playerWinPanel.SetActive(false);
+        tiePanel.SetActive(true);
+    }
+
 }

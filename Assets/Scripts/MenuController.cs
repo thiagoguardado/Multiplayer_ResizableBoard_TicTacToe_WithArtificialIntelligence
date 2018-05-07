@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Controls player input on menu screen
+/// </summary>
 public class MenuController : MonoBehaviour {
 
 

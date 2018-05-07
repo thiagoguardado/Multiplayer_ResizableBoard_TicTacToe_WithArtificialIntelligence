@@ -3,10 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Controls board appearence
+/// </summary>
 public class BoardView : MonoBehaviour {
 
+    // references
     public Transform positionsParent;
     public Transform gridParent;
+    public UIView uiView;
+    public Animator gridAnimator;
+    private BoardManager m_boardManager;
+    private List<LineRenderer> gridLineRenderes = new List<LineRenderer>();
+
+    // prefabs
     public GameObject gridLinePrefab;
     public GameObject gridPositionPrefab;
 
@@ -16,13 +26,10 @@ public class BoardView : MonoBehaviour {
     public PlayerSprite triangleSprite;
     public PlayerSprite squareSprite;
 
+    // list of positions
     private List<BoardPositionController> m_boardPositions = new List<BoardPositionController>();
-    private BoardManager m_boardManager;
 
-    public UIView uiView;
-    public Animator gridAnimator;
 
-    private List<LineRenderer> gridLineRenderes = new List<LineRenderer>();
 
     public void Initialize(BoardManager boardManager, int size)
     {
@@ -34,6 +41,11 @@ public class BoardView : MonoBehaviour {
         AudioManager.Instance.ShufflePlayerAudio();
     }
 
+
+    /// <summary>
+    /// Change board size
+    /// </summary>
+    /// <param name="size"></param>
     private void ChangeSize(int size)
     {
         if (size > 3)
@@ -46,6 +58,10 @@ public class BoardView : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Creates grid of lines
+    /// </summary>
+    /// <param name="size"></param>
     private void CreateGrid(int size) {
 
         GameObject go;
@@ -86,6 +102,10 @@ public class BoardView : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Instantiate position controller prefab on positions
+    /// </summary>
+    /// <param name="size"></param>
     private void CreatePositions(int size) {
 
         int index = 0;
@@ -103,6 +123,9 @@ public class BoardView : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Gets all position controllers
+    /// </summary>
     private void GetControllers() {
 
         BoardPositionController bpc;
@@ -114,6 +137,10 @@ public class BoardView : MonoBehaviour {
         }
     }
 
+
+    /// <summary>
+    /// Updates entire boardview
+    /// </summary>
     public void UpdateView()
     {
         for (int i = 0; i < positionsParent.childCount; i++)
@@ -129,12 +156,21 @@ public class BoardView : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Action executed when player added to board
+    /// </summary>
+    /// <param name="playerIndex"></param>
     internal void AddedPlayerToBoard(int playerIndex)
     {
         gridAnimator.SetTrigger("Tilt");
         AudioManager.Instance.PlayPlayerSFX(playerIndex);
     }
 
+
+    /// <summary>
+    /// Action executed when game found a winner
+    /// </summary>
+    /// <param name="winningPlayer"></param>
     public void PlayerWin(GamePlayer winningPlayer)
     {
         uiView.PlayerWin(winningPlayer);
@@ -143,6 +179,10 @@ public class BoardView : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Change board color to match winner
+    /// </summary>
+    /// <param name="color"></param>
     private void ChangeBoardColor(Color color)
     {
         for (int i = 0; i < gridLineRenderes.Count; i++)
@@ -151,6 +191,9 @@ public class BoardView : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Actions to execute when game reached a tie
+    /// </summary>
     public void Tie()
     {
         uiView.Tie();
@@ -158,6 +201,7 @@ public class BoardView : MonoBehaviour {
     }
 
 }
+
 
 [System.Serializable]
 public class PlayerSprite {

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Change all flying objects colors
+/// </summary>
 public class FlyingObjectsCanvasView : MonoBehaviour {
 
     public Transform diagonalPanelsParent;

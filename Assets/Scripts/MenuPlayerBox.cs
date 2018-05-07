@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Controls game configuration menu player box
+/// </summary>
 public class MenuPlayerBox : MonoBehaviour {
 
     public Image image;

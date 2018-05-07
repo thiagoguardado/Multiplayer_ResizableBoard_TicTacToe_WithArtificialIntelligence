@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Controls player interaction with game screen after the game finishes
+/// </summary>
 public class GameUiController : MonoBehaviour {
 
     private float timer = 0f;

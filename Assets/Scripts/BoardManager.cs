@@ -11,12 +11,14 @@ public enum PlayerSymbol
     Triangle,
     Square
 }
+
 public enum GameResult
 {
     None,
     PlayerWin,
     TicTacToe
 }
+
 public enum PlayerType
 {
     Human,
@@ -33,11 +35,18 @@ public enum WinningCheck
 
 public class BoardManager : MonoBehaviour {
 
-    public static BoardManager Instance;
+    public static BoardManager Instance;    // singleton
 
-    public int boardSize = 3;
+    [Header("Settings")]
+    public WinningCheck winningCheck;   // type of winning condition check (look full board or lined up symbols)
+    public int maxLineWidth;            // number of lined up symbols to determine win condition if winning check set to MaxWidth
+    public IAManager.MinimaxType minimaxType = IAManager.MinimaxType.Classic; // minimax type
+    public int maxMinimaxDepth = 8; // max depth minimax can calculate
 
-    private Board m_board;
+    [Header("Board and Players")]
+    public int boardSize = 3;   // current game boad size
+    public List<GamePlayer> players = new List<GamePlayer>(); // list of current players
+    private Board m_board; // current game board object
     public Board Board
     {
         get
@@ -45,21 +54,12 @@ public class BoardManager : MonoBehaviour {
             return m_board;
         }
     }
+    
+    private GamePlayer winningPlayer; // player that won game
+    private BoardView m_boardView; // reference to view
+    private IAManager m_iaManager; // reference to AI manager
 
-    public int maxLineWidth;
-    public WinningCheck winningCheck;
-
-    public List<GamePlayer> players = new List<GamePlayer>();
-
-    public IAManager.MinimaxType minimaxType = IAManager.MinimaxType.Classic;
-    public int maxMinimaxDepth = 8;
-
-    private GamePlayer winningPlayer;
-
-    private BoardView m_boardView;
-    private IAManager m_iaManager;
-
-    private GameResult m_currentResult = GameResult.None;
+    private GameResult m_currentResult = GameResult.None; // current game result
     public GameResult CurrentResult
     {
         get
@@ -100,9 +100,13 @@ public class BoardManager : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Loads setup from setting menu
+    /// </summary>
     private void LoadSetup()
     {
-        if (GameManager.Instance != null)
+
+        if (GameManager.Instance != null) //check if gamemanager with setting exists
         {
             boardSize = GameManager.boardSize;
 
@@ -115,28 +119,30 @@ public class BoardManager : MonoBehaviour {
 
             }
 
-
             maxMinimaxDepth = MaxAcceptableDepth(boardSize);
 
         }
     }
 
+    /// <summary>
+    /// Resets Board
+    /// </summary>
     private void Reset()
     {
+
+        // removes all players from board
         for (int i = 0; i < m_board.FullBoard.Count; i++)
         {
             m_board.RemovePlayerFromBoard(i);
         }
-
         m_boardView.UpdateView();
 
+        // recreate AI
         IAManager[] ias = GetComponents<IAManager>();
         for (int i = 0; i < ias.Length; i++)
         {
             Destroy(ias[i]);
         }
-
-        // initialize IA
         for (int i = 0; i < players.Count; i++)
         {
             if (players[i].playerType == PlayerType.AI_Easy ||
@@ -148,16 +154,25 @@ public class BoardManager : MonoBehaviour {
             }
         }
 
+        // change game result and set player one
         m_currentResult = GameResult.None;
         m_board.SetPlayer(players[0]);
     }
 
+    /// <summary>
+    /// Checks if game is concluded
+    /// </summary>
     private void CheckAndResolveEndGame() {
 
         EndGame(m_board.CheckEndGame(out winningPlayer));
 
     }
 
+
+    /// <summary>
+    /// Add a player to board at position
+    /// </summary>
+    /// <param name="position"></param>
     public void AddPlayerToBoard(int position)
     {
 
@@ -175,7 +190,6 @@ public class BoardManager : MonoBehaviour {
                 }
 
                 m_boardView.AddedPlayerToBoard(playerIndex);
-
                 m_boardView.UpdateView();
 
                 // check end of game
@@ -189,7 +203,10 @@ public class BoardManager : MonoBehaviour {
 
     }
 
-
+    /// <summary>
+    /// Resolves end game according to game result
+    /// </summary>
+    /// <param name="result"></param>
     private void EndGame(GameResult result)
     {
 
@@ -211,6 +228,10 @@ public class BoardManager : MonoBehaviour {
 
     }
 
+
+    /// <summary>
+    /// Execute actions if a player has won the game
+    /// </summary>
     private void PlayerWin()
     {
         Debug.Log(winningPlayer.playerSymbol.ToString() + " wins");
@@ -218,6 +239,9 @@ public class BoardManager : MonoBehaviour {
         GameManager.Instance.FinishGame();
     }
 
+    /// <summary>
+    /// Execute actions if the game finished in a tie
+    /// </summary>
     private void Tie()
     {
         m_boardView.Tie();
@@ -225,7 +249,11 @@ public class BoardManager : MonoBehaviour {
         GameManager.Instance.FinishGame();
     }
 
-
+    /// <summary>
+    /// Select maximum depth looked by the AI minimax, according to board size
+    /// </summary>
+    /// <param name="boardSize"></param>
+    /// <returns></returns>
     private int MaxAcceptableDepth(int boardSize)
     {
         switch (boardSize)
@@ -250,10 +278,13 @@ public class BoardManager : MonoBehaviour {
 
 }
 
+/// <summary>
+/// Board object, containing positions data
+/// </summary>
 public struct Board
 {
 
-    private int m_size;
+    private int m_size;         // board size
     public int Size
     {
         get
@@ -262,7 +293,7 @@ public struct Board
         }
     }
 
-    private List<GamePlayer> m_fullBoard;
+    private List<GamePlayer> m_fullBoard;   // all board positions
     public List<GamePlayer> FullBoard
     {
         get
@@ -271,8 +302,8 @@ public struct Board
         }
     }
 
-    private List<GamePlayer> players;
-    private GamePlayer currentPlayer;
+    private List<GamePlayer> players;   // players playing on board
+    private GamePlayer currentPlayer;   // current player playing
     public GamePlayer CurrentPlayer {
         get
         {
@@ -280,11 +311,17 @@ public struct Board
         }
     }
 
-    private WinningCheck m_winningCheck;
-    private int m_maxWidth;
+    private WinningCheck m_winningCheck;    // type of winning condition check
+    private int m_maxWidth;                 // max lined up symbols to win if winning condition check set to MaxWidth
 
 
-    // constructor
+    /// <summary>
+    /// Constructs a board object
+    /// </summary>
+    /// <param name="size"></param>
+    /// <param name="_players"></param>
+    /// <param name="_winningCheck"></param>
+    /// <param name="_maxWidth"></param>
     public Board(int size, List<GamePlayer> _players, WinningCheck _winningCheck, int _maxWidth)
     {
         // create board
@@ -295,14 +332,21 @@ public struct Board
             m_fullBoard.Add(null);
         }
 
+        // add players
         players = _players;
         currentPlayer = _players[0];
+
+        // set up winning check
         m_maxWidth = _maxWidth;
         m_winningCheck = _winningCheck;
         
 
     }
 
+    /// <summary>
+    /// Constructs a board using another as reference
+    /// </summary>
+    /// <param name="referenceBoard"></param>
     public Board(Board referenceBoard)
     {
         m_size = referenceBoard.Size;
@@ -318,11 +362,20 @@ public struct Board
 
     }
 
+    /// <summary>
+    /// Returns a position status
+    /// </summary>
+    /// <param name="i"></param>
+    /// <returns></returns>
     private GamePlayer PlayerAtBoardPosition(int i)
     {
         return m_fullBoard[i];
     }
 
+    /// <summary>
+    /// Finds all empty positions remaining on board
+    /// </summary>
+    /// <returns></returns>
     public List<int> FindEmptyPositions()
     {
         List<int> emptyPositions = new List<int>();
@@ -334,6 +387,10 @@ public struct Board
         return emptyPositions;
     }
 
+    /// <summary>
+    /// Checks if board is full
+    /// </summary>
+    /// <returns></returns>
     public bool IsFullyFilled()
     {
         for (int i = 0; i < m_fullBoard.Count; i++)
@@ -344,6 +401,10 @@ public struct Board
         return true;
     }
 
+    /// <summary>
+    /// Set current player
+    /// </summary>
+    /// <param name="newPlayer"></param>
     public void SetPlayer(GamePlayer newPlayer)
     {
 
@@ -351,6 +412,10 @@ public struct Board
 
     }
 
+    /// <summary>
+    /// Gets next player 
+    /// </summary>
+    /// <returns></returns>
     public GamePlayer NextPlayer()
     {
         for (int i = 0; i < players.Count; i++)
@@ -358,7 +423,6 @@ public struct Board
             if (players[i] == currentPlayer)
             {
                 return players[(i + 1) % players.Count];
-
             }
         }
 
@@ -366,7 +430,12 @@ public struct Board
         return null;
     }
 
-
+    /// <summary>
+    /// Adds a player to position on board
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="player"></param>
+    /// <returns></returns>
     public bool AddPlayerToBoard(int position,GamePlayer player)
     {
         GamePlayer gp = PlayerAtBoardPosition(position);
@@ -383,15 +452,25 @@ public struct Board
         return false;
     }
 
+    /// <summary>
+    /// Removes any player from position
+    /// </summary>
+    /// <param name="position"></param>
     public void RemovePlayerFromBoard(int position)
     {
         m_fullBoard[position] = null;
     }
 
+    /// <summary>
+    /// Check if any player has won or if a tie has reached
+    /// </summary>
+    /// <param name="winningPlayerSymbol"></param>
+    /// <returns></returns>
     public GameResult CheckEndGame(out GamePlayer winningPlayerSymbol)
     {
-        winningPlayerSymbol = null;
 
+        // first look for a winner
+        winningPlayerSymbol = null;
         GamePlayer playerWon;
 
         switch (m_winningCheck)
@@ -408,7 +487,7 @@ public struct Board
         }
 
 
-        // check tie
+        // check tie if no winner
         if (playerWon == null)
         {
             if (CheckTie())
@@ -421,9 +500,15 @@ public struct Board
             winningPlayerSymbol = playerWon;
             return GameResult.PlayerWin;
         }
+
+        // if no winner and no tie, return null
         return GameResult.None;
     }
 
+    /// <summary>
+    /// Check winning condition based on full board
+    /// </summary>
+    /// <returns></returns>
     private GamePlayer CheckWinning()
     {
 
@@ -458,6 +543,11 @@ public struct Board
         return playerWon;
     }
 
+
+    /// <summary>
+    /// Check winning condition based on max streak of lined up symbols
+    /// </summary>
+    /// <returns></returns>
     private GamePlayer CheckWinningMaxWidth()
     {
 
@@ -492,14 +582,20 @@ public struct Board
         return playerWon;
     }
 
+    /// <summary>
+    /// Check if a tie has reached
+    /// </summary>
+    /// <returns></returns>
     private bool CheckTie()
     {
-
         return IsFullyFilled();
-
-
     }
 
+
+    /// <summary>
+    /// Check if any player has won in lines
+    /// </summary>
+    /// <returns></returns>
     private GamePlayer CheckLines()
     {
         GamePlayer p;
@@ -540,6 +636,11 @@ public struct Board
         return null;
     }
 
+
+    /// <summary>
+    /// Check if any player has won in lines using max streak of lined up symbols
+    /// </summary>
+    /// <returns></returns>
     private GamePlayer CheckLinesMaxWidth(int maxWidth)
     {
         GamePlayer p;
@@ -592,6 +693,10 @@ public struct Board
     }
 
 
+    /// <summary>
+    /// Check if any player has won in columns
+    /// </summary>
+    /// <returns></returns>
     private GamePlayer CheckColumns()
     {
         GamePlayer p;
@@ -632,6 +737,10 @@ public struct Board
         return null;
     }
 
+    /// <summary>
+    /// Check if any player has won in columns using max streak of lined up symbols
+    /// </summary>
+    /// <returns></returns>
     private GamePlayer CheckColumnsMaxWidth(int maxWidth)
     {
         GamePlayer p;
@@ -683,7 +792,10 @@ public struct Board
         return null;
     }
 
-
+    /// <summary>
+    /// Check if any player has won in northwest-southeast diagonal
+    /// </summary>
+    /// <returns></returns>
     private GamePlayer CheckDiagonal1()
     {
         GamePlayer p;
@@ -714,6 +826,10 @@ public struct Board
         return p;
     }
 
+    /// <summary>
+    /// Check if any player has won in northwest-southeast diagonals using max streak of lined up symbols
+    /// </summary>
+    /// <returns></returns>
     private GamePlayer CheckDiagonal1MaxWidth(int maxWidth)
     {
 
@@ -767,6 +883,11 @@ public struct Board
         return null;
     }
 
+
+    /// <summary>
+    /// Check if any player has won in northeast-southwest diagonal
+    /// </summary>
+    /// <returns></returns>
     private GamePlayer CheckDiagonal2()
     {
         GamePlayer p;
@@ -797,6 +918,11 @@ public struct Board
         return p;
     }
 
+
+    /// <summary>
+    /// Check if any player has won in northeast-southwest diagonals using max streak of lined up symbols
+    /// </summary>
+    /// <returns></returns>
     private GamePlayer CheckDiagonal2MaxWidth(int maxWidth)
     {
 
@@ -852,6 +978,9 @@ public struct Board
 
 }
 
+/// <summary>
+/// A player, containing symbol, type, sprite and color
+/// </summary>
 [System.Serializable]
 public class GamePlayer
 {
@@ -859,6 +988,7 @@ public class GamePlayer
     public PlayerType playerType;
     public PlayerSprite playerSprite;
 
+    // constructor using reference
     public GamePlayer(GamePlayer reference)
     {
         if (reference != null)
@@ -869,6 +999,7 @@ public class GamePlayer
         }
     }
 
+    // constructor
     public GamePlayer(PlayerSymbol playerSymbol, PlayerType playerType, Sprite sprite, Color color)
     {
         this.playerSymbol = playerSymbol;

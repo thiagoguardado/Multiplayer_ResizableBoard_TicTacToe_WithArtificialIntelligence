@@ -13,9 +13,9 @@ public enum GameState
 
 public class GameManager : MonoBehaviour {
 
-    public static GameManager Instance;
+    public static GameManager Instance;                     //  singleton
 
-    private static GameState gameState = GameState.Menu;
+    private static GameState gameState = GameState.Menu;    // stores current game state
     public static GameState GameState
     {
         get
@@ -24,14 +24,12 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    public static bool playerCanInteract = true;
+    public static bool playerCanInteract = true;            // determine if player can interact with game
+    public static int numberOfPlayers;                      // current number of players
+    public static int boardSize;                            // current board size
+    public static List<Player> players = new List<Player>();// current list of players
 
-    public static int numberOfPlayers;
-    public static int boardSize;
-
-    public static List<Player> players = new List<Player>();
-
-    public static bool initialized = false;
+    public static bool initialized = false; // if game manager has been initialized
     
     private void Awake()
     {
@@ -48,6 +46,9 @@ public class GameManager : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Starts game
+    /// </summary>
     public void StartGame()
     {
         SceneManager.LoadScene("GameScene");
@@ -56,11 +57,17 @@ public class GameManager : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// finishes a game
+    /// </summary>
     public void FinishGame()
     {
         gameState = GameState.GameFinished;
     }
 
+    /// <summary>
+    /// Return to menu after finished game
+    /// </summary>
     public void ReturnToMenu()
     {
         SceneManager.LoadScene("GameSelection");
@@ -68,23 +75,29 @@ public class GameManager : MonoBehaviour {
         gameState = GameState.Menu;
     }
 
+    /// <summary>
+    /// Returns to title screen
+    /// </summary>
     public void ReturnToTitleScreen()
     {
         SceneManager.LoadScene("TitleScreen");
         gameState = GameState.Menu;
     }
 
-
+    /// <summary>
+    /// Initialize with default values
+    /// </summary>
     public void Initialize()
     {
 
         if (!initialized)
         {
 
-            // populate players
+            // setup board
             boardSize = 3;
-            numberOfPlayers = 2;
 
+            // setup players
+            numberOfPlayers = 2;
             players.Add(new Player(MenuManager.Instance.possiblePlayerSprites[0]));
             players.Add(new Player(MenuManager.Instance.possiblePlayerSprites[1]));
 
@@ -93,6 +106,12 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Change number of players
+    /// </summary>
+    /// <param name="possibleNumberOfPlayers"></param>
+    /// <param name="greater"></param>
+    /// <returns></returns>
     public static bool ChangeNumberOfPlayers(int[] possibleNumberOfPlayers, bool greater)
     {
         if(ChangeNumber(ref numberOfPlayers, possibleNumberOfPlayers, greater))
@@ -112,6 +131,12 @@ public class GameManager : MonoBehaviour {
         return false;
     }
 
+    /// <summary>
+    /// Change board size
+    /// </summary>
+    /// <param name="possibleBoardSize"></param>
+    /// <param name="greater"></param>
+    /// <returns></returns>
     public static bool ChangeBoardSize(int[] possibleBoardSize, bool greater)
     {
         return ChangeNumber(ref boardSize, possibleBoardSize, greater);

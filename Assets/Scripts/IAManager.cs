@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
+/// <summary>
+/// Artificial Intelligence to play on tictactoe game
+/// </summary>
 public class IAManager: MonoBehaviour {
 
     public enum MinimaxType
@@ -20,25 +23,33 @@ public class IAManager: MonoBehaviour {
         Hard
     }
 
-    private List<int> emptyPositions;
-    private Board board;
+    private Board board;                    // reference to board the AI is playing
+    private List<int> emptyPositions;       // empty positions on board
+    private GamePlayer m_gamePlayer;        // reference to board game player representing this AI
+    private BoardManager m_boardManager;    // reference to board manager controlling game
+    private MinimaxType m_minimaxType;      // type of minimax
+    private int m_maxDepth;                 // max depth in minimax the AI can look
+    private Difficulty m_difficulty;        // AI difficulty
 
-    private GamePlayer m_gamePlayer;
-    private MinimaxType m_minimaxType;
-    private BoardManager m_boardManager;
-    private int m_maxDepth;
-    private Difficulty m_difficulty;
+    private float waitingTimeBeforePlay = 1.25f; // minimum time waiting before making move
 
-    private float waitingTimeBeforePlay = 1.25f;
+
+    // Minimax variables
+    GamePlayer m_minimaxWinningSymbol;
+    Thread t;
+    bool threadRunning;
     private float waitingTime;
     private bool isWaiting;
     private bool finishedCalculation;
     private int moveIndex;
-    GamePlayer m_minimaxWinningSymbol;
-    Thread t;
-    bool threadRunning;
-    
 
+    /// <summary>
+    /// Initialize tha AI
+    /// </summary>
+    /// <param name="_boardManager"></param>
+    /// <param name="_player"></param>
+    /// <param name="minimaxType"></param>
+    /// <param name="maxDepth"></param>
     public void Initialize(BoardManager _boardManager, GamePlayer _player, MinimaxType minimaxType, int maxDepth)
     {
         m_boardManager = _boardManager;
@@ -63,6 +74,9 @@ public class IAManager: MonoBehaviour {
         
     }
 
+    /// <summary>
+    /// sets thread runiing bool to false so thread stops after the game is closed
+    /// </summary>
     private void OnDisable()
     {
         threadRunning = false;
@@ -78,6 +92,8 @@ public class IAManager: MonoBehaviour {
             {
                 if (finishedCalculation)
                 {
+
+                    // if finished calculation and finished waiting, apply movement to board
                     moveIndex = AdjustMovementByDifficulty(moveIndex);
                     m_boardManager.AddPlayerToBoard(moveIndex);
                     isWaiting = false;
@@ -86,6 +102,7 @@ public class IAManager: MonoBehaviour {
             }
             else
             {
+                // if not finished calculation, increase timer
                 waitingTime += Time.deltaTime;
                 return;
             }
@@ -93,6 +110,7 @@ public class IAManager: MonoBehaviour {
         }
         else
         {
+            // if AI turn and game not finished, start minimax calculation
             if (m_boardManager.Board.CurrentPlayer == m_gamePlayer && m_boardManager.CurrentResult == GameResult.None)
             {
                 waitingTime = 0;
@@ -100,10 +118,7 @@ public class IAManager: MonoBehaviour {
                 finishedCalculation = false;
                 emptyPositions = m_boardManager.Board.FindEmptyPositions();
                 emptyPositions = ShuffleList<int>(emptyPositions);
-                threadRunning = true;
-
-                //FindBestMovement();
-           
+                threadRunning = true;           
                 t = new Thread(this.FindBestMovement);
                 t.Start();
                 
@@ -111,6 +126,11 @@ public class IAManager: MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Depending on AI difficulty, consider minimax movement or random movement before applying to board
+    /// </summary>
+    /// <param name="moveIndex"></param>
+    /// <returns></returns>
     private int AdjustMovementByDifficulty(int moveIndex)
     {
         switch (m_difficulty)
@@ -137,9 +157,11 @@ public class IAManager: MonoBehaviour {
 
     }
 
-    public void FindBestMovement() {
 
-        
+    /// <summary>
+    /// Finds best movement to make, using manimax funtion
+    /// </summary>
+    public void FindBestMovement() {
 
         if (emptyPositions.Count > 0)
         {
@@ -165,6 +187,13 @@ public class IAManager: MonoBehaviour {
 
     }
 
+
+    /// <summary>
+    /// Shuffles a list
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="list"></param>
+    /// <returns></returns>
     private List<T> ShuffleList<T>(List<T> list)
     {
         //randomize list
@@ -179,21 +208,33 @@ public class IAManager: MonoBehaviour {
         return list;
     }
 
+
+    /// <summary>
+    /// Classic minimax
+    /// </summary>
+    /// <param name="isMax"></param>
+    /// <param name="positionIndex"></param>
+    /// <param name="depth"></param>
+    /// <returns></returns>
     private int MinimaxClassic(bool isMax, out int positionIndex,int depth)
     {
         positionIndex = 0;
 
+        // stops if thread aborted
         if (!threadRunning)
         {
             return 0;
         }
 
+        // check if game has reached end
         GameResult result = board.CheckEndGame(out m_minimaxWinningSymbol);
         if (result != GameResult.None || depth <= 0)
         {
             return CalculateScore(result, m_minimaxWinningSymbol);
         }
 
+
+        // recursion
         GamePlayer minimaxCurrentPlayer = board.CurrentPlayer;
         int testIndex;
         int branchValue;
@@ -252,21 +293,34 @@ public class IAManager: MonoBehaviour {
 
     }
 
+
+    /// <summary>
+    /// Minimax funtion with alpha-beta prunning
+    /// </summary>
+    /// <param name="isMax"></param>
+    /// <param name="positionIndex"></param>
+    /// <param name="alpha"></param>
+    /// <param name="beta"></param>
+    /// <param name="depth"></param>
+    /// <returns></returns>
     private int MinimaxAlphaBeta(bool isMax, out int positionIndex, int alpha, int beta,int depth)
     {
         positionIndex = 0;
 
+        // finished if thread aborted
         if (!threadRunning)
         {
             return 0;
         }
 
+        // check if game has reached end
         GameResult result = board.CheckEndGame(out m_minimaxWinningSymbol);
         if (result != GameResult.None || depth <=0)
         {
             return CalculateScore(result, m_minimaxWinningSymbol);
         }
 
+        // recursion
         GamePlayer m_minimaxCurrentPlayer = board.CurrentPlayer;
         int testIndex;
         int branchValue;
@@ -302,10 +356,7 @@ public class IAManager: MonoBehaviour {
                         //positionIndex = testIndex;
                         break;
                     }
-
                 }
-
-
             }
         }
         else
@@ -336,20 +387,20 @@ public class IAManager: MonoBehaviour {
                         //positionIndex = testIndex;
                         break;
                     }
-
                 }
-
-
-
             }
-
         }
 
         return bestValue;
 
     }
 
-
+    /// <summary>
+    /// Heuristic funtion to calculate score depending on board 
+    /// </summary>
+    /// <param name="gameResult"></param>
+    /// <param name="winningPlayer"></param>
+    /// <returns></returns>
     private int CalculateScore(GameResult gameResult, GamePlayer winningPlayer) {
 
         switch (gameResult)
@@ -368,11 +419,5 @@ public class IAManager: MonoBehaviour {
             default:
                 return 0;
         }
-
- 
-
-
     }
-
-
 }

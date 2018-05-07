@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
+/// <summary>
+/// Controls game configuration menu
+/// </summary>
 public class MenuManager : MonoBehaviour {
 
     public static MenuManager Instance;

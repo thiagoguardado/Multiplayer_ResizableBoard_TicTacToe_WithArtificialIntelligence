@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
+/// <summary>
+/// Controls player input in title screen
+/// </summary>
 public class TitleScreenController : MonoBehaviour {
 
     public Animator titleAnimator;

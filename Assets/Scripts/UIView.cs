@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Displays elements in game scene
+/// </summary>
 public class UIView : MonoBehaviour {
 
     private PlayerSprite currentPlayer;

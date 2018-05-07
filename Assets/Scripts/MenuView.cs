@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Controls game configuration menu screen appearence
+/// </summary>
 public class MenuView : MonoBehaviour {
 
     public MenuPlayerBox playerBoxPrefab;

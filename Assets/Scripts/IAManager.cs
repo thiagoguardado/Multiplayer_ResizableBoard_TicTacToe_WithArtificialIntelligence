@@ -12,6 +12,14 @@ public class IAManager: MonoBehaviour {
         AlphaBeta
     }
 
+    public enum Difficulty
+    {
+        None,
+        Easy,
+        Medium,
+        Hard
+    }
+
     private List<int> emptyPositions;
     private Board board;
 
@@ -19,8 +27,9 @@ public class IAManager: MonoBehaviour {
     private MinimaxType m_minimaxType;
     private BoardManager m_boardManager;
     private int m_maxDepth;
+    private Difficulty m_difficulty;
 
-    private float waitingTimeBeforePlay = 0.5f;
+    private float waitingTimeBeforePlay = 0.75f;
     private float waitingTime;
     private bool isWaiting;
     private bool finishedCalculation;
@@ -35,6 +44,22 @@ public class IAManager: MonoBehaviour {
         m_gamePlayer = _player;
         m_minimaxType = minimaxType;
         m_maxDepth = maxDepth;
+        switch (_player.playerType)
+        {
+            case PlayerType.AI_Easy:
+                m_difficulty = Difficulty.Easy;
+                break;
+            case PlayerType.AI_Medium:
+                m_difficulty = Difficulty.Medium;
+                break;
+            case PlayerType.AI_Hard:
+                m_difficulty = Difficulty.Hard;
+                break;
+            default:
+                m_difficulty = Difficulty.None;
+                break;
+        }
+        
     }
 
     private void OnDisable()
@@ -52,6 +77,7 @@ public class IAManager: MonoBehaviour {
             {
                 if (finishedCalculation)
                 {
+                    moveIndex = AdjustMovementByDifficulty(moveIndex);
                     m_boardManager.AddPlayerToBoard(moveIndex);
                     isWaiting = false;
                     return;
@@ -78,6 +104,32 @@ public class IAManager: MonoBehaviour {
                 t.Start();
             }
         }
+    }
+
+    private int AdjustMovementByDifficulty(int moveIndex)
+    {
+        switch (m_difficulty)
+        {
+            case Difficulty.Easy:
+
+                if (UnityEngine.Random.value > 0.33f)
+                {
+                    return emptyPositions[UnityEngine.Random.Range(0, emptyPositions.Count)];
+                }
+                break;
+            case Difficulty.Medium:
+                if (UnityEngine.Random.value > 0.66f)
+                {
+                    return emptyPositions[UnityEngine.Random.Range(0, emptyPositions.Count)];
+                }
+                break;
+            case Difficulty.Hard:
+            default:
+                break;
+        }
+
+        return moveIndex;
+
     }
 
     public void FindBestMovement() {

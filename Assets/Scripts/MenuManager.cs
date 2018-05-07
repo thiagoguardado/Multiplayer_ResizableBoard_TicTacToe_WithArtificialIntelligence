@@ -14,7 +14,6 @@ public class MenuManager : MonoBehaviour {
 
     public Animator numberOfPlayersAnimator;
     public Animator boardSizeAnimator;
-    public Animator startButtonAnimator;
 
     private MenuView menuView;
 
@@ -23,6 +22,9 @@ public class MenuManager : MonoBehaviour {
     {
         Instance = this;
         menuView = GetComponent<MenuView>();
+
+        GameManager.Instance.Initialize();
+
     }
 
 
@@ -38,6 +40,8 @@ public class MenuManager : MonoBehaviour {
         {
             boardSizeAnimator.SetTrigger("change");
             menuView.UpdateView();
+            AudioManager.Instance.PlayOptionSelectSFX();
+
         }
     }
 
@@ -47,14 +51,11 @@ public class MenuManager : MonoBehaviour {
         {
             numberOfPlayersAnimator.SetTrigger("change");
             menuView.UpdateView();
+            AudioManager.Instance.PlayOptionSelectSFX();
         }
     }
 
 
-    public void StartGame() {
-        startButtonAnimator.SetTrigger("change");
-        SceneManager.LoadScene("GameScene");
-    }
 
 }
 

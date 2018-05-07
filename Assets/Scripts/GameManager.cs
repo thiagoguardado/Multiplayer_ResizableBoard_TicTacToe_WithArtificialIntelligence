@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum GameState
 {
@@ -30,7 +31,7 @@ public class GameManager : MonoBehaviour {
 
     public static List<Player> players = new List<Player>();
 
-
+    public static bool initialized = false;
     
     private void Awake()
     {
@@ -47,20 +48,49 @@ public class GameManager : MonoBehaviour {
 
     }
 
-    private void Start()
+    public void StartGame()
     {
-        Initialize();
+        SceneManager.LoadScene("GameScene");
+        AudioManager.Instance.ChangeToInGameMusic();
+        gameState = GameState.GameStarted;
+
     }
 
-    private void Initialize()
+    public void FinishGame()
     {
-        // populate players
-        boardSize = 3;
-        numberOfPlayers = 2;
+        gameState = GameState.GameFinished;
+    }
 
-        players.Add(new Player(MenuManager.Instance.possiblePlayerSprites[0]));
-        players.Add(new Player(MenuManager.Instance.possiblePlayerSprites[1]));
+    public void ReturnToMenu()
+    {
+        SceneManager.LoadScene("GameSelection");
+        AudioManager.Instance.ChangeToMenuMusic();
+        gameState = GameState.Menu;
+    }
 
+    public void ReturnToTitleScreen()
+    {
+        SceneManager.LoadScene("TitleScreen");
+        gameState = GameState.Menu;
+    }
+
+
+    public void Initialize()
+    {
+
+        if (!initialized)
+        {
+
+            // populate players
+            boardSize = 3;
+            numberOfPlayers = 2;
+
+            players.Add(new Player(MenuManager.Instance.possiblePlayerSprites[0]));
+            players.Add(new Player(MenuManager.Instance.possiblePlayerSprites[1]));
+
+            initialized = true;
+
+        }
     }
 
     public static bool ChangeNumberOfPlayers(int[] possibleNumberOfPlayers, bool greater)

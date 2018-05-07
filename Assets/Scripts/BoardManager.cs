@@ -20,7 +20,9 @@ public enum GameResult
 public enum PlayerType
 {
     Human,
-    AI
+    AI_Easy,
+    AI_Medium,
+    AI_Hard
 }
 
 public enum WinningCheck
@@ -87,29 +89,15 @@ public class BoardManager : MonoBehaviour {
         // initialize IA
         for (int i = 0; i < players.Count; i++)
         {
-            if (players[i].playerType == PlayerType.AI)
+            if (players[i].playerType == PlayerType.AI_Easy ||
+                players[i].playerType == PlayerType.AI_Medium ||
+                players[i].playerType == PlayerType.AI_Hard)
             {
                 IAManager ia = gameObject.AddComponent<IAManager>();
                 ia.Initialize(this, players[i], minimaxType,maxMinimaxDepth);
             }
         }
-    }
 
-    private void Update()
-    {
-        if (m_currentResult != GameResult.None) {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                Reset();
-                ReturnToMenu();
-            }
-
-        }
-    }
-
-    private void ReturnToMenu()
-    {
-        SceneManager.LoadScene("GameSelection");
     }
 
     private void LoadSetup()
@@ -151,7 +139,9 @@ public class BoardManager : MonoBehaviour {
         // initialize IA
         for (int i = 0; i < players.Count; i++)
         {
-            if (players[i].playerType == PlayerType.AI)
+            if (players[i].playerType == PlayerType.AI_Easy ||
+                players[i].playerType == PlayerType.AI_Medium ||
+                players[i].playerType == PlayerType.AI_Hard)
             {
                 IAManager ia = gameObject.AddComponent<IAManager>();
                 ia.Initialize(this, players[i], minimaxType,maxMinimaxDepth);
@@ -175,6 +165,17 @@ public class BoardManager : MonoBehaviour {
         {
             if (m_board.AddPlayerToBoard(position, m_board.CurrentPlayer))
             {
+                int playerIndex = 0;
+                for (int i = 0; i < players.Count; i++)
+                {
+                    if (players[i] == m_board.CurrentPlayer)
+                    {
+                        playerIndex = i;
+                    }
+                }
+
+                m_boardView.AddedPlayerToBoard(playerIndex);
+
                 m_boardView.UpdateView();
 
                 // check end of game
@@ -214,12 +215,14 @@ public class BoardManager : MonoBehaviour {
     {
         Debug.Log(winningPlayer.playerSymbol.ToString() + " wins");
         m_boardView.PlayerWin(winningPlayer);
+        GameManager.Instance.FinishGame();
     }
 
     private void Tie()
     {
         m_boardView.Tie();
         Debug.Log("Tie!");
+        GameManager.Instance.FinishGame();
     }
 
 
@@ -798,7 +801,7 @@ public struct Board
         for (int i = 0; i < (m_size - maxWidth + 1); i++)
         {
 
-            for (int l = (m_size - 1); l > (m_size - maxWidth - 1); l--)
+            for (int l = (m_size - 1); l > (maxWidth - 2); l--)
             {
 
                 p = m_fullBoard[(i * m_size) + l];

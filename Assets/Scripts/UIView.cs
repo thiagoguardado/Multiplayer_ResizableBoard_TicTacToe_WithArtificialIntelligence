@@ -16,6 +16,7 @@ public class UIView : MonoBehaviour {
 
     private bool updatingNextPlayer;
 
+    private Animator nextPlayerAnimator;
 
     void Awake()
     {
@@ -23,6 +24,7 @@ public class UIView : MonoBehaviour {
         nextPlayerPanel.SetActive(true);
         playerWinPanel.SetActive(false);
         tiePanel.SetActive(false);
+        nextPlayerAnimator = nextPlayerPanel.GetComponent<Animator>();
     }
 
 	void Update () {
@@ -41,6 +43,7 @@ public class UIView : MonoBehaviour {
             currentPlayer = BoardManager.Instance.Board.CurrentPlayer.playerSprite;
             nextPlayerImage.sprite = currentPlayer.sprite;
             nextPlayerImage.color = currentPlayer.color;
+            nextPlayerAnimator.SetTrigger("tilt");
 
         }
 
@@ -54,8 +57,13 @@ public class UIView : MonoBehaviour {
         playerWinPanel.SetActive(true);
         tiePanel.SetActive(false);
 
+        playerWinPanel.GetComponent<Animator>().SetBool("pulsing", true);
+
         playerWinImage.sprite = winningPlayer.playerSprite.sprite;
         playerWinImage.color = winningPlayer.playerSprite.color;
+
+
+
 
     }
 
@@ -65,6 +73,8 @@ public class UIView : MonoBehaviour {
         nextPlayerPanel.SetActive(false);
         playerWinPanel.SetActive(false);
         tiePanel.SetActive(true);
+
+        tiePanel.GetComponent<Animator>().SetBool("pulsing", true);
     }
 
 }

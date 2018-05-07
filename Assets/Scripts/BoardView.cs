@@ -20,6 +20,7 @@ public class BoardView : MonoBehaviour {
     private BoardManager m_boardManager;
 
     public UIView uiView;
+    public Animator gridAnimator;
 
     private List<LineRenderer> gridLineRenderes = new List<LineRenderer>();
 
@@ -30,6 +31,7 @@ public class BoardView : MonoBehaviour {
         CreatePositions(size);
         ChangeSize(size);
         GetControllers();
+        AudioManager.Instance.ShufflePlayerAudio();
     }
 
     private void ChangeSize(int size)
@@ -127,10 +129,17 @@ public class BoardView : MonoBehaviour {
         }
     }
 
+    internal void AddedPlayerToBoard(int playerIndex)
+    {
+        gridAnimator.SetTrigger("Tilt");
+        AudioManager.Instance.PlayPlayerSFX(playerIndex);
+    }
+
     public void PlayerWin(GamePlayer winningPlayer)
     {
         uiView.PlayerWin(winningPlayer);
         ChangeBoardColor(winningPlayer.playerSprite.color);
+        AudioManager.Instance.PlayEndGame();
 
     }
 
@@ -145,6 +154,7 @@ public class BoardView : MonoBehaviour {
     public void Tie()
     {
         uiView.Tie();
+        AudioManager.Instance.PlayEndGame();
     }
 
 }

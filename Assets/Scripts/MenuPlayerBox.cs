@@ -1,8 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
 
 public class MenuPlayerBox : MonoBehaviour {
 
@@ -17,32 +17,49 @@ public class MenuPlayerBox : MonoBehaviour {
     {
         image.sprite = sprite;
         image.color = color;
-        label.text = type.ToString();
+
+        switch (type)
+        {
+            case PlayerType.Human:
+                label.text = "Human";
+                break;
+            case PlayerType.AI_Easy:
+                label.text = "AI EASY";
+                break;
+            case PlayerType.AI_Medium:
+                label.text = "AI MEDIUM";
+                break;
+            case PlayerType.AI_Hard:
+                label.text = "AI HARD";
+                break;
+            default:
+                label.text = type.ToString();
+                break;
+        }
+
+        
         index = _index;
         menuView = _menuView;
     }
 
     public void ChangeColor()
     {
-        GameManager.players[index].color = new Color(Random.value, Random.value, Random.value);
+        GameManager.players[index].color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
         menuView.UpdateView();
         imageAnimator.SetTrigger("change");
+        AudioManager.Instance.PlayOptionSelectSFX();
 
     }
 
     public void ChangeType()
     {
-        if (GameManager.players[index].playerType == PlayerType.AI)
-        {
-            GameManager.players[index].playerType = PlayerType.Human;
-        }
-        else
-        {
-            GameManager.players[index].playerType = PlayerType.AI;
-        }
+        GameManager.players[index].playerType = (PlayerType)(((int)GameManager.players[index].playerType + 1) % Enum.GetValues(typeof(PlayerType)).Length);
+
         menuView.UpdateView();
 
         textAnimator.SetTrigger("change");
+
+        AudioManager.Instance.PlayOptionSelectSFX();
     }
 
 }

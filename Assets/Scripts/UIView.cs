@@ -18,6 +18,8 @@ public class UIView : MonoBehaviour {
 
     private Animator nextPlayerAnimator;
 
+    public Animator userActionAnimator;
+
     void Awake()
     {
         updatingNextPlayer = true;
@@ -34,7 +36,31 @@ public class UIView : MonoBehaviour {
             ChangeNextPlayer();
         }
 
+        UpdateActionPanel();
+
 	}
+
+    private void UpdateActionPanel()
+    {
+        if (GameManager.GameState == GameState.GameFinished)
+        {
+            userActionAnimator.SetBool("off", true);
+            return;
+        }
+        else
+        {
+            userActionAnimator.SetBool("off", false);
+        }
+
+        if (BoardManager.Instance.Board.CurrentPlayer.playerType == PlayerType.Human)
+        {
+            userActionAnimator.SetBool("waiting", false);
+        }
+        else
+        {
+            userActionAnimator.SetBool("waiting", true);
+        }
+    }
 
     private void ChangeNextPlayer()
     {
@@ -62,7 +88,7 @@ public class UIView : MonoBehaviour {
         playerWinImage.sprite = winningPlayer.playerSprite.sprite;
         playerWinImage.color = winningPlayer.playerSprite.color;
 
-
+        updatingNextPlayer = false;
 
 
     }
@@ -75,6 +101,8 @@ public class UIView : MonoBehaviour {
         tiePanel.SetActive(true);
 
         tiePanel.GetComponent<Animator>().SetBool("pulsing", true);
+
+        updatingNextPlayer = false;
     }
 
 }

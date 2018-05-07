@@ -233,9 +233,9 @@ public class BoardManager : MonoBehaviour {
             case 3:
                 return 8;
             case 4:
-                return 5;
+                return 6;
             case 5:
-                return 4;
+                return 5;
             case 6:
                 return 3;
             case 7:
@@ -283,6 +283,7 @@ public struct Board
     private WinningCheck m_winningCheck;
     private int m_maxWidth;
 
+
     // constructor
     public Board(int size, List<GamePlayer> _players, WinningCheck _winningCheck, int _maxWidth)
     {
@@ -298,6 +299,7 @@ public struct Board
         currentPlayer = _players[0];
         m_maxWidth = _maxWidth;
         m_winningCheck = _winningCheck;
+        
 
     }
 
@@ -313,6 +315,7 @@ public struct Board
         currentPlayer = referenceBoard.currentPlayer;
         m_maxWidth = referenceBoard.m_maxWidth;
         m_winningCheck = referenceBoard.m_winningCheck;
+
     }
 
     private GamePlayer PlayerAtBoardPosition(int i)
@@ -329,6 +332,16 @@ public struct Board
                 emptyPositions.Add(i);
         }
         return emptyPositions;
+    }
+
+    public bool IsFullyFilled()
+    {
+        for (int i = 0; i < m_fullBoard.Count; i++)
+        {
+            if (m_fullBoard[i] == null)
+                return false;
+        }
+        return true;
     }
 
     public void SetPlayer(GamePlayer newPlayer)
@@ -482,16 +495,8 @@ public struct Board
     private bool CheckTie()
     {
 
-        List<int> empty = FindEmptyPositions();
+        return IsFullyFilled();
 
-        if (empty.Count == 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
 
     }
 
@@ -844,7 +849,6 @@ public struct Board
 
         return null;
     }
-
 
 }
 

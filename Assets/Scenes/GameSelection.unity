@@ -318,20 +318,25 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 1293739223087628, guid: 42aa921e03cc4ed419de1dfb85cc2187, type: 2}
-      propertyPath: m_Name
-      value: SizeSelector
-      objectReference: {fileID: 0}
-    - target: {fileID: 114439753834002324, guid: 42aa921e03cc4ed419de1dfb85cc2187,
-        type: 2}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 1935393259}
     - target: {fileID: 114295453226699380, guid: 42aa921e03cc4ed419de1dfb85cc2187,
         type: 2}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1935393259}
+    - target: {fileID: 114439753834002324, guid: 42aa921e03cc4ed419de1dfb85cc2187,
+        type: 2}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1935393259}
+    - target: {fileID: 1293739223087628, guid: 42aa921e03cc4ed419de1dfb85cc2187, type: 2}
+      propertyPath: m_Name
+      value: SizeSelector
+      objectReference: {fileID: 0}
+    - target: {fileID: 114145956534644142, guid: 42aa921e03cc4ed419de1dfb85cc2187,
+        type: 2}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 42aa921e03cc4ed419de1dfb85cc2187, type: 2}
   m_IsPrefabParent: 0
@@ -721,6 +726,12 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!114 &1410207091 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114752037038965530, guid: 42aa921e03cc4ed419de1dfb85cc2187,
+    type: 2}
+  m_PrefabInternal: {fileID: 563584277}
+  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
 --- !u!1001 &1455596831
 Prefab:
   m_ObjectHideFlags: 0
@@ -1000,7 +1011,12 @@ MonoBehaviour:
   playerBoxPrefab: {fileID: 114147151314450218, guid: 7221eaa9b06e5fc43b9d917b78c796b1,
     type: 2}
   numberOfPlayers: {fileID: 256180281}
+  numberOfPlayersGreaterSign: {fileID: 1665932213}
+  numberOfPlayersLesserSign: {fileID: 1054691862}
   boardSize: {fileID: 1047587565}
+  boardSizeGreaterSign: {fileID: 2027987062}
+  boardSizeLesserSign: {fileID: 1410207091}
+  signColorWhenDisabled: {r: 1, g: 1, b: 1, a: 0.141}
   menuPlayerBoxesCenter: {fileID: 1899307798}
 --- !u!114 &1935393262
 MonoBehaviour:
@@ -1013,6 +1029,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8be6cef9f033ba47ba1cf40f75f458b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2027987062 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114145956534644142, guid: 42aa921e03cc4ed419de1dfb85cc2187,
+    type: 2}
+  m_PrefabInternal: {fileID: 563584277}
+  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
 --- !u!1 &2080159167
 GameObject:
   m_ObjectHideFlags: 0

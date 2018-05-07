@@ -29,7 +29,7 @@ public class IAManager: MonoBehaviour {
     private int m_maxDepth;
     private Difficulty m_difficulty;
 
-    private float waitingTimeBeforePlay = 0.75f;
+    private float waitingTimeBeforePlay = 1.25f;
     private float waitingTime;
     private bool isWaiting;
     private bool finishedCalculation;
@@ -37,6 +37,7 @@ public class IAManager: MonoBehaviour {
     GamePlayer m_minimaxWinningSymbol;
     Thread t;
     bool threadRunning;
+    
 
     public void Initialize(BoardManager _boardManager, GamePlayer _player, MinimaxType minimaxType, int maxDepth)
     {
@@ -100,8 +101,12 @@ public class IAManager: MonoBehaviour {
                 emptyPositions = m_boardManager.Board.FindEmptyPositions();
                 emptyPositions = ShuffleList<int>(emptyPositions);
                 threadRunning = true;
+
+                //FindBestMovement();
+           
                 t = new Thread(this.FindBestMovement);
                 t.Start();
+                
             }
         }
     }
@@ -133,6 +138,8 @@ public class IAManager: MonoBehaviour {
     }
 
     public void FindBestMovement() {
+
+        
 
         if (emptyPositions.Count > 0)
         {
@@ -366,5 +373,6 @@ public class IAManager: MonoBehaviour {
 
 
     }
+
 
 }

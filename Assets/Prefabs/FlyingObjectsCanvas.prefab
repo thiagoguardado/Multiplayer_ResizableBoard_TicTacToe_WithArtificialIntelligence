@@ -105,7 +105,6 @@ GameObject:
   m_Component:
   - component: {fileID: 224333072772116220}
   - component: {fileID: 222243164253185056}
-  - component: {fileID: 114487417664199908}
   - component: {fileID: 95660761264140520}
   - component: {fileID: 225309681645950692}
   m_Layer: 5
@@ -991,33 +990,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   diagonalPanelsParent: {fileID: 224333072772116220}
---- !u!114 &114487417664199908
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1383446287714348}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
-  m_RaycastTarget: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
 --- !u!114 &114526542340476734
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2012,7 +1984,7 @@ CanvasGroup:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1383446287714348}
   m_Enabled: 1
-  m_Alpha: 0.2
+  m_Alpha: 0.1
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0

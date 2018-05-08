@@ -40,7 +40,7 @@ public class BoardManager : MonoBehaviour {
     [Header("Settings")]
     public WinningCheck winningCheck;   // type of winning condition check (look full board or lined up symbols)
     public int maxLineWidth;            // number of lined up symbols to determine win condition if winning check set to MaxWidth
-    public IAManager.MinimaxType minimaxType = IAManager.MinimaxType.Classic; // minimax type
+    public AIManager.MinimaxType minimaxType = AIManager.MinimaxType.Classic; // minimax type
     public int maxMinimaxDepth = 8; // max depth minimax can calculate
 
     [Header("Board and Players")]
@@ -57,7 +57,7 @@ public class BoardManager : MonoBehaviour {
     
     private GamePlayer winningPlayer; // player that won game
     private BoardView m_boardView; // reference to view
-    private IAManager m_iaManager; // reference to AI manager
+    private AIManager m_iaManager; // reference to AI manager
 
     private GameResult m_currentResult = GameResult.None; // current game result
     public GameResult CurrentResult
@@ -93,7 +93,7 @@ public class BoardManager : MonoBehaviour {
                 players[i].playerType == PlayerType.AI_Medium ||
                 players[i].playerType == PlayerType.AI_Hard)
             {
-                IAManager ia = gameObject.AddComponent<IAManager>();
+                AIManager ia = gameObject.AddComponent<AIManager>();
                 ia.Initialize(this, players[i], minimaxType,maxMinimaxDepth);
             }
         }
@@ -138,7 +138,7 @@ public class BoardManager : MonoBehaviour {
         m_boardView.UpdateView();
 
         // recreate AI
-        IAManager[] ias = GetComponents<IAManager>();
+        AIManager[] ias = GetComponents<AIManager>();
         for (int i = 0; i < ias.Length; i++)
         {
             Destroy(ias[i]);
@@ -149,7 +149,7 @@ public class BoardManager : MonoBehaviour {
                 players[i].playerType == PlayerType.AI_Medium ||
                 players[i].playerType == PlayerType.AI_Hard)
             {
-                IAManager ia = gameObject.AddComponent<IAManager>();
+                AIManager ia = gameObject.AddComponent<AIManager>();
                 ia.Initialize(this, players[i], minimaxType,maxMinimaxDepth);
             }
         }

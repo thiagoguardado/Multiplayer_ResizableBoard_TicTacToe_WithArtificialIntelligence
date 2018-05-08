@@ -1,17 +1,36 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Controls player interaction with game screen after the game finishes
+/// Controls player interaction with game screen except clickable board positions
 /// </summary>
-public class GameUiController : MonoBehaviour {
+public class GameUserInputController : MonoBehaviour {
 
     private float timer = 0f;
     public float waitBeforeCanReturnToMenu = 1f;
 
     private void Update()
+    {
+
+        CheckEcapeClick();
+
+        CheckClickAfterGameEnd();
+    }
+
+    private void CheckEcapeClick()
+    {
+        if (Input.GetButtonDown("Cancel"))
+        {
+            GameManager.Instance.FinishGame();
+            AudioManager.Instance.PlayReturnSFX();
+            GameManager.Instance.ReturnToMenu();
+        }
+    }
+
+    private void CheckClickAfterGameEnd()
     {
         if (GameManager.GameState == GameState.GameFinished)
         {
@@ -32,9 +51,4 @@ public class GameUiController : MonoBehaviour {
 
         }
     }
-
-
-
-
-
 }

@@ -21,6 +21,23 @@ public class TitleScreenController : MonoBehaviour {
 
     }
 
+    public void PressCreditsButton()
+    {
+
+        SceneManager.LoadScene("Credits");
+        AudioManager.Instance.PlayOptionSelectSFX();
+
+    }
+
+
+    public void PressExitButton()
+    {
+
+        AudioManager.Instance.PlayOptionSelectSFX();
+        Application.Quit();
+    }
+
+
     private IEnumerator WaitAndChangeScreen()
     {
 

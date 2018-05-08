@@ -7,7 +7,7 @@ using UnityEngine;
 /// <summary>
 /// Artificial Intelligence to play on tictactoe game
 /// </summary>
-public class IAManager: MonoBehaviour {
+public class AIManager: MonoBehaviour {
 
     public enum MinimaxType
     {
@@ -31,7 +31,7 @@ public class IAManager: MonoBehaviour {
     private int m_maxDepth;                 // max depth in minimax the AI can look
     private Difficulty m_difficulty;        // AI difficulty
 
-    private float waitingTimeBeforePlay = 1.25f; // minimum time waiting before making move
+    private float waitingTimeBeforePlay = 0.9f; // minimum time waiting before making move
 
 
     // Minimax variables

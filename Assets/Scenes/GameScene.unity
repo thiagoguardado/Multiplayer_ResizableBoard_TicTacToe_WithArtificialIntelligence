@@ -171,8 +171,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -125, y: 75}
-  m_SizeDelta: {x: 250, y: 150}
+  m_AnchoredPosition: {x: -75, y: 75}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &66075426
 GameObject:
@@ -394,15 +394,15 @@ RectTransform:
   m_GameObject: {fileID: 230823710}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.0765257, y: 2.0765257, z: 2.0765257}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 783597435}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 158.34999, y: -1.6199}
-  m_SizeDelta: {x: -90, y: -65}
+  m_AnchoredPosition: {x: 155.98004, y: -1.0999985}
+  m_SizeDelta: {x: 80.239944, y: -37.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &230823712
 MonoBehaviour:
@@ -425,11 +425,11 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 12800000, guid: d5f0bced353a9564fba10a893a93ab0d, type: 3}
-    m_FontSize: 27
+    m_FontSize: 55
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 57
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -1105,15 +1105,15 @@ RectTransform:
   m_GameObject: {fileID: 1205231555}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.4242954, y: 1.4242953, z: 1.4242953}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 358204884}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -65.69997, y: -0.6408739}
-  m_SizeDelta: {x: -90, y: -65}
+  m_AnchoredPosition: {x: -65.55, y: 0.5999994}
+  m_SizeDelta: {x: -14.300007, y: -50.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1205231557
 MonoBehaviour:
@@ -1136,7 +1136,7 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 12800000, guid: d5f0bced353a9564fba10a893a93ab0d, type: 3}
-    m_FontSize: 27
+    m_FontSize: 40
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
@@ -1304,6 +1304,48 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1637447020
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4805357213741444, guid: ecb843fa0c8a2be449dcd6004725be85, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4805357213741444, guid: ecb843fa0c8a2be449dcd6004725be85, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4805357213741444, guid: ecb843fa0c8a2be449dcd6004725be85, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4805357213741444, guid: ecb843fa0c8a2be449dcd6004725be85, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4805357213741444, guid: ecb843fa0c8a2be449dcd6004725be85, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4805357213741444, guid: ecb843fa0c8a2be449dcd6004725be85, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4805357213741444, guid: ecb843fa0c8a2be449dcd6004725be85, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4805357213741444, guid: ecb843fa0c8a2be449dcd6004725be85, type: 2}
+      propertyPath: m_RootOrder
+      value: 5
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: ecb843fa0c8a2be449dcd6004725be85, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &1804079915
 GameObject:
   m_ObjectHideFlags: 0
@@ -1397,7 +1439,7 @@ RectTransform:
   m_GameObject: {fileID: 1933742813}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.0765257, y: 2.0765257, z: 2.0765257}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 432225644}
   m_RootOrder: 0
@@ -1405,7 +1447,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -1.6199251}
-  m_SizeDelta: {x: 160, y: 29}
+  m_SizeDelta: {x: 247.6, y: 57.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1933742815
 MonoBehaviour:
@@ -1428,11 +1470,11 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 12800000, guid: d5f0bced353a9564fba10a893a93ab0d, type: 3}
-    m_FontSize: 27
+    m_FontSize: 59
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 59
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -1628,6 +1670,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   positionsParent: {fileID: 1441342930}
   gridParent: {fileID: 833152185}
+  uiView: {fileID: 1423835193}
+  gridAnimator: {fileID: 833152186}
   gridLinePrefab: {fileID: 1326920978077190, guid: 825638b19dfe5a84eb95c64ddbda107b,
     type: 2}
   gridPositionPrefab: {fileID: 1325508018815754, guid: 6bf230a9ca1b59941a5693bc0a8e9239,
@@ -1644,8 +1688,6 @@ MonoBehaviour:
   squareSprite:
     sprite: {fileID: 0}
     color: {r: 0, g: 0, b: 0, a: 0}
-  uiView: {fileID: 1423835193}
-  gridAnimator: {fileID: 833152186}
 --- !u!114 &2040340868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1657,9 +1699,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7254a5a18cecc4848a45805156489f7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardSize: 3
-  maxLineWidth: 3
   winningCheck: 1
+  maxLineWidth: 3
+  minimaxType: 1
+  maxMinimaxDepth: 8
+  boardSize: 3
   players:
   - playerSymbol: 1
     playerType: 1
@@ -1671,8 +1715,6 @@ MonoBehaviour:
     playerSprite:
       sprite: {fileID: 21300000, guid: bee62361db181094aa1a40dc51efb48a, type: 3}
       color: {r: 0.7352941, g: 0, b: 0, a: 1}
-  minimaxType: 1
-  maxMinimaxDepth: 8
 --- !u!1 &2136463803
 GameObject:
   m_ObjectHideFlags: 0

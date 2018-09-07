@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 /// <summary>
@@ -22,11 +23,22 @@ public class TitleScreenController : MonoBehaviour {
 
     }
 
-    public void PressStartNetworkButton()
+    public void PressStartLANNetworkButton()
     {
 
         titleAnimator.SetBool("Snap", true);
         AudioManager.Instance.PlayStartGameSFX();
+        NetworkManager.singleton.GetComponent<MyNetworkManager>().NetworkType = NetworkType.LAN;
+        StartCoroutine(WaitAndChangeScreen("NetworkGameSetup"));
+
+    }
+
+    public void PressStartInternetNetworkButton()
+    {
+
+        titleAnimator.SetBool("Snap", true);
+        AudioManager.Instance.PlayStartGameSFX();
+        NetworkManager.singleton.GetComponent<MyNetworkManager>().NetworkType = NetworkType.Internet;
         StartCoroutine(WaitAndChangeScreen("NetworkGameSetup"));
 
     }

@@ -70,7 +70,7 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     public void ReturnToMenu()
     {
-        SceneManager.LoadScene("GameSelection");
+        SceneManager.LoadScene("LocalGameSetup");
         AudioManager.Instance.ChangeToMenuMusic();
         gameState = GameState.Menu;
     }

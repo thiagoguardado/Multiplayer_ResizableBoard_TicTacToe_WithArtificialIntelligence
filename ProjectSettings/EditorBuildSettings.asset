@@ -9,8 +9,11 @@ EditorBuildSettings:
     path: Assets/Scenes/TitleScreen.unity
     guid: 76f9a3eb50816154ebf76363e9a4c8e7
   - enabled: 1
-    path: Assets/Scenes/GameSelection.unity
+    path: Assets/Scenes/LocalGameSetup.unity
     guid: f7aa9ee3ebf6edb4caf3cf2e7f81c3bf
+  - enabled: 1
+    path: Assets/Scenes/NetworkGameSetup.unity
+    guid: 9026c8c1ac76536429694d699b61fafe
   - enabled: 1
     path: Assets/Scenes/GameScene.unity
     guid: 6c1071608cb2176469e00128d4d4678f

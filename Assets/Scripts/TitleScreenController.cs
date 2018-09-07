@@ -12,14 +12,25 @@ public class TitleScreenController : MonoBehaviour {
     public float waitBeforeChangeScreen;
    
 
-    public void PressStartButton()
+    public void PressStartLocalButton()
     {
 
         titleAnimator.SetBool("Snap", true);
-        StartCoroutine(WaitAndChangeScreen());
         AudioManager.Instance.PlayStartGameSFX();
+        StartCoroutine(WaitAndChangeScreen("LocalGameSetup"));
+
 
     }
+
+    public void PressStartNetworkButton()
+    {
+
+        titleAnimator.SetBool("Snap", true);
+        AudioManager.Instance.PlayStartGameSFX();
+        StartCoroutine(WaitAndChangeScreen("NetworkGameSetup"));
+
+    }
+
 
     public void PressCreditsButton()
     {
@@ -38,12 +49,12 @@ public class TitleScreenController : MonoBehaviour {
     }
 
 
-    private IEnumerator WaitAndChangeScreen()
+    private IEnumerator WaitAndChangeScreen(string nextScene)
     {
 
         yield return new WaitForSeconds(waitBeforeChangeScreen);
 
-        SceneManager.LoadScene("GameSelection");
+        SceneManager.LoadScene(nextScene);
 
     }
 

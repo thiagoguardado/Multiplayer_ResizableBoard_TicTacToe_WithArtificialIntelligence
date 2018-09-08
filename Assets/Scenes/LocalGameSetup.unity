@@ -1126,15 +1126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64b3ba008bb685f40b71c3820d322619, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  possiblePlayerSprites:
-  - playerSymbol: 0
-    playerSprite: {fileID: 21300000, guid: bee62361db181094aa1a40dc51efb48a, type: 3}
-  - playerSymbol: 1
-    playerSprite: {fileID: 21300000, guid: 237a1d7155bd0b24aa45c4cf3c771107, type: 3}
-  - playerSymbol: 2
-    playerSprite: {fileID: 21300000, guid: f6080c266fe412f4baedc8716f5e60aa, type: 3}
-  - playerSymbol: 3
-    playerSprite: {fileID: 21300000, guid: 75947e447d3444c46903b4c4731f3cdb, type: 3}
+  playerSymbols: {fileID: 11400000, guid: ca1a8b7f57777404ca10417420c30d46, type: 2}
   PossibleNumberOfPlayers: 020000000300000004000000
   PossibleBoardSize: 03000000040000000500000006000000070000000800000009000000
   numberOfPlayersAnimator: {fileID: 256180280}

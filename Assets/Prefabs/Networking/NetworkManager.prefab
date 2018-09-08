@@ -52,7 +52,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cffec67071a23e248a588568c3394e66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_NetworkPort: 5757
+  m_NetworkPort: 7777
   m_ServerBindToIP: 0
   m_ServerBindAddress: 
   m_NetworkAddress: localhost
@@ -122,6 +122,7 @@ MonoBehaviour:
   matchSize: 4
   isNetworkActive: 0
   matchMaker: {fileID: 0}
+  possibleSymbols: {fileID: 11400000, guid: ca1a8b7f57777404ca10417420c30d46, type: 2}
 --- !u!114 &114660800717553030
 MonoBehaviour:
   m_ObjectHideFlags: 1

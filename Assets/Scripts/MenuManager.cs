@@ -11,13 +11,14 @@ public class MenuManager : MonoBehaviour {
 
     public static MenuManager Instance;
 
-    public List<SymbolAndSprite> possiblePlayerSprites;
-
+    public PlayerSymbols playerSymbols;
     public int[] PossibleNumberOfPlayers = { 2, 3, 4 };
     public int[] PossibleBoardSize = { 3, 4, 5, 6, 7, 8, 9 };
 
     public Animator numberOfPlayersAnimator;
     public Animator boardSizeAnimator;
+
+    
 
     private MenuView menuView;
 
@@ -76,12 +77,15 @@ public class Player
         color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
         playerType = PlayerType.Human;
     }
+
+    public Player(SymbolAndSprite _playerSymbolAndSprite, Color color)
+    {
+        playerSymbolAndSprite = _playerSymbolAndSprite;
+        this.color = color;
+        playerType = PlayerType.Human;
+    }
+
 }
 
-[System.Serializable]
-public class SymbolAndSprite
-{
-    public PlayerSymbol playerSymbol;
-    public Sprite playerSprite;
-}
+
 

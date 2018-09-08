@@ -98,8 +98,8 @@ public class GameManager : MonoBehaviour {
 
             // setup players
             numberOfPlayers = 2;
-            players.Add(new Player(MenuManager.Instance.possiblePlayerSprites[0]));
-            players.Add(new Player(MenuManager.Instance.possiblePlayerSprites[1]));
+            players.Add(new Player(MenuManager.Instance.playerSymbols.possiblePlayerSprites[0]));
+            players.Add(new Player(MenuManager.Instance.playerSymbols.possiblePlayerSprites[1]));
 
             initialized = true;
 
@@ -118,7 +118,7 @@ public class GameManager : MonoBehaviour {
         {
             if (greater)
             {
-                players.Add(new Player(MenuManager.Instance.possiblePlayerSprites[players.Count]));
+                players.Add(new Player(MenuManager.Instance.playerSymbols.possiblePlayerSprites[players.Count]));
                 return true;
             }
             else

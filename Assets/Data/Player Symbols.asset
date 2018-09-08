@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9df847d327de9c54e93831ab351da0ae, type: 3}
+  m_Name: Player Symbols
+  m_EditorClassIdentifier: 
+  possiblePlayerSprites:
+  - playerSymbol: 0
+    playerSprite: {fileID: 21300000, guid: bee62361db181094aa1a40dc51efb48a, type: 3}
+  - playerSymbol: 1
+    playerSprite: {fileID: 21300000, guid: 237a1d7155bd0b24aa45c4cf3c771107, type: 3}
+  - playerSymbol: 2
+    playerSprite: {fileID: 21300000, guid: f6080c266fe412f4baedc8716f5e60aa, type: 3}
+  - playerSymbol: 3
+    playerSprite: {fileID: 21300000, guid: 75947e447d3444c46903b4c4731f3cdb, type: 3}

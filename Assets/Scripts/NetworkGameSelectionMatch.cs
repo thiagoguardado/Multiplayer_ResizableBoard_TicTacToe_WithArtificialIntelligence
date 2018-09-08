@@ -12,7 +12,7 @@ public class NetworkGameSelectionMatch : MonoBehaviour {
 
     public void SetName(string newName)
     {
-        matchName.text = newName.Substring(0, maxCharsInName);
+        matchName.text = newName.Substring(0, Mathf.Min(newName.Length,maxCharsInName));
     }
 
     public void SetPlayers(List<Player> players)

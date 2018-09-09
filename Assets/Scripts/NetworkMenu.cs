@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,7 +19,8 @@ public class NetworkMenu : MonoBehaviour {
 
     private float refreshListTimer = 0f;
     private MyNetworkManager myNetwork;
-    private List<NetworkBroadcastResult> _matches = new List<NetworkBroadcastResult>();
+    private List<MatchData> _matchesToDisplay = new List<MatchData>();
+    private List<NetworkGameSelectionMatch> _currentMatchesDisplayed = new List<NetworkGameSelectionMatch>();
 
     private void Awake()
     {
@@ -49,12 +51,12 @@ public class NetworkMenu : MonoBehaviour {
     #region Display
     private void RefreshGames()
     {
-        ClearMatchList();
-
-        _matches.Clear();
+        _matchesToDisplay.Clear();
 
         foreach (NetworkBroadcastResult result in MyNetworkManager.Discovery.broadcastsReceived.Values)
         {
+
+            string matchData = Encoding.Unicode.GetString(result.broadcastData);
             MatchData match;
             
             try
@@ -66,10 +68,42 @@ public class NetworkMenu : MonoBehaviour {
                 Debug.LogError(e.Message);
                 continue;
             }
-            
 
-            AddMatchToList(match);
+            _matchesToDisplay.Add(match);
         }
+
+
+        List<NetworkGameSelectionMatch> updatedGames = new List<NetworkGameSelectionMatch>();
+
+        for (int i = 0; i < _matchesToDisplay.Count; i++)
+        {
+
+            bool found = false;
+            for (int j = 0; j < _currentMatchesDisplayed.Count; j++)
+            {
+                if (_currentMatchesDisplayed[j].thisMatchData.matchName == _matchesToDisplay[i].matchName)
+                {
+                    _currentMatchesDisplayed[j].Setup(_matchesToDisplay[i]);
+                    updatedGames.Add(_currentMatchesDisplayed[j]);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                updatedGames.Add(AddMatchToList(_matchesToDisplay[i]));
+            }
+        }
+
+
+        NetworkGameSelectionMatch[] gamesToDelete = _currentMatchesDisplayed.Except(updatedGames).ToArray();
+        foreach (var item in gamesToDelete)
+        {
+            RemoveMatchFromList(item);
+        }
+       
+
     }
 
 
@@ -95,10 +129,18 @@ public class NetworkMenu : MonoBehaviour {
         return true;
     }
 
-    private void AddMatchToList(MatchData matchData)
+    private NetworkGameSelectionMatch AddMatchToList(MatchData matchData)
     {
         NetworkGameSelectionMatch m = Instantiate(matchPanelPrefab, matchListPanelParent);
         m.Setup(matchData);
+        _currentMatchesDisplayed.Add(m);
+        return m;
+    }
+
+    private void RemoveMatchFromList(NetworkGameSelectionMatch matchCard)
+    {
+        _currentMatchesDisplayed.Remove(matchCard);
+        Destroy(matchCard);
     }
 
     private void ClearMatchList()

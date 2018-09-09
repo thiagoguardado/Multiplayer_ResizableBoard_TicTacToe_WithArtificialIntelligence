@@ -691,6 +691,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 173d2ee754841af4297f9ce21d301f61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  possibleSymbols: {fileID: 11400000, guid: ca1a8b7f57777404ca10417420c30d46, type: 2}
   matchPanelPrefab: {fileID: 114415337690011614, guid: 4cac5917f25613c449f15ae77bf556cc,
     type: 2}
   matchListPanelParent: {fileID: 224847125971285642}

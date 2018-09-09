@@ -64,10 +64,7 @@ public class MyNetworkManager : NetworkManager {
     public override void OnServerConnect(NetworkConnection conn)
     {
         currentMatch.AddPlayer(new MatchData.SpriteAndColor(possibleSymbols.possiblePlayerSprites[2], Color.yellow));
-
-        Discovery.StopBroadcast();
-        Discovery.broadcastData = MatchData.CreateMatchBroadcastData(currentMatch);
-        Discovery.StartAsServer();
+        RefreshBroadcastInfo();
 
     }
 
@@ -75,12 +72,15 @@ public class MyNetworkManager : NetworkManager {
     {
 
         currentMatch.RemovePlayer();
+        RefreshBroadcastInfo();
+    }
 
+    private void RefreshBroadcastInfo()
+    {
         Discovery.StopBroadcast();
         Discovery.broadcastData = MatchData.CreateMatchBroadcastData(currentMatch);
         Discovery.StartAsServer();
     }
-    
 
 
 }

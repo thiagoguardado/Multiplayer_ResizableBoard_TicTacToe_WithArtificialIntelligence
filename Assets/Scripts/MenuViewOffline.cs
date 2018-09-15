@@ -7,26 +7,17 @@ using UnityEngine.UI;
 /// <summary>
 /// Controls game configuration menu screen appearence
 /// </summary>
-public abstract class MenuView : MonoBehaviour {
+public class MenuViewOffline : MenuView
+{
 
-    public MenuPlayerBox playerBoxPrefab;
+    public Text numberOfPlayers;
+    public Image numberOfPlayersGreaterSign;
+    public Image numberOfPlayersLesserSign;
 
-    public Text boardSize;
-    public Image boardSizeGreaterSign;
-    public Image boardSizeLesserSign;
-    public Color signColorWhenDisabled;
-    public Transform menuPlayerBoxesCenter;
-    protected List<MenuPlayerBox> menuPlayerBoxes = new List<MenuPlayerBox>();
-
-
-    public abstract void UpdateView();
-
-    private void UpdateBoardSize()
+    public override void UpdateView()
     {
-        boardSize.text = GameManager.boardSize.ToString();
-
-        // checkButtons
-        CheckLesserAndGreaterSigns(GameManager.boardSize, MenuManager.Instance.PossibleBoardSize, boardSizeLesserSign, boardSizeGreaterSign);
+        UpdateNumberOfPlayers();
+        UpdateMenuPlayerBoxes();
 
     }
 
@@ -51,7 +42,30 @@ public abstract class MenuView : MonoBehaviour {
         }
     }
 
-    protected abstract void UpdateMenuPlayerBoxes();
+
+    private void UpdateNumberOfPlayers()
+    {
+        numberOfPlayers.text = GameManager.numberOfPlayers.ToString();
+
+        // check buttons
+        CheckLesserAndGreaterSigns(GameManager.numberOfPlayers, MenuManager.Instance.PossibleNumberOfPlayers, numberOfPlayersLesserSign, numberOfPlayersGreaterSign);
+    }
+
+    protected override void UpdateMenuPlayerBoxes()
+    {
+        // check if number of player boxes is equal to players
+        if (menuPlayerBoxes.Count != GameManager.numberOfPlayers)
+        {
+            CreateNewPlayerBoxes();
+        }
+
+        for (int i = 0; i < GameManager.numberOfPlayers; i++)
+        {
+            Player p = GameManager.players[i];
+            menuPlayerBoxes[i].Setup(p.playerSymbolAndSprite.playerSprite, p.color, p.playerType, i, this);
+
+        }
+    }
 
     private void CreateNewPlayerBoxes()
     {

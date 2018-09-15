@@ -24,7 +24,7 @@ public class NetworkGameSelectionMatch : MonoBehaviour {
         matchName.text = newName.Substring(0, Mathf.Min(newName.Length,maxCharsInName));
     }
 
-    private void SetPlayers(List<MatchData.SpriteAndColor> players)
+    private void SetPlayers(List<MatchData.MatchPlayer> players)
     {
         foreach (Image image in playerSymbols)
         {

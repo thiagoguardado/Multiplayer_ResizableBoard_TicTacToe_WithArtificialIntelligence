@@ -12,8 +12,8 @@ public class NetworkMenu : MonoBehaviour {
     public PlayerSymbols possibleSymbols;
     public NetworkGameSelectionMatch matchPanelPrefab;
     public Transform matchListPanelParent;
-    public GameObject popupMenu;
-    public InputField matchNameInput;
+    public PopupPanel popup;
+    public Text playerNameDisplay;
 
     public float refreshListTime = 1f;
 
@@ -61,7 +61,7 @@ public class NetworkMenu : MonoBehaviour {
             
             try
             {
-                match = new MatchData(result, possibleSymbols);
+                match = new MatchData(result, possibleSymbols,"");
             }
             catch (System.Exception e)
             {
@@ -109,17 +109,16 @@ public class NetworkMenu : MonoBehaviour {
 
     public void CreateNewMatch()
     {
-        popupMenu.SetActive(true);
-        EventSystem.current.SetSelectedGameObject(matchNameInput.gameObject);
+        popup.OpenNewMatch(ConfirmNewMatchCreation);
     }
 
 
-    public void ConfirmNewMatchCreation()
+    public void ConfirmNewMatchCreation(string newMatchName)
     {
-        if (ValidateMatchName(matchNameInput.text))
+        if (ValidateMatchName(newMatchName))
         {
-            popupMenu.SetActive(false);
-            myNetwork.StartBroadcastingNewMatch(matchNameInput.text);
+            popup.ClosePopup();
+            myNetwork.StartBroadcastingNewMatch(newMatchName);
         }
     }
 
@@ -127,6 +126,26 @@ public class NetworkMenu : MonoBehaviour {
     private bool ValidateMatchName(string matchName)
     {
         return true;
+    }
+
+    private bool ValidatePlayerName(string playerName)
+    {
+        return playerName != "";
+    }
+
+    public void ChangePlayerName()
+    {
+        popup.OpenChangeName(myNetwork.playerName, ConfirmNewPlayerName);
+    }
+
+    public void ConfirmNewPlayerName(string newPlayerName)
+    {
+        if (ValidatePlayerName(newPlayerName))
+        {
+            popup.ClosePopup();
+            myNetwork.playerName = newPlayerName;
+            playerNameDisplay.text = myNetwork.playerName;
+        }
     }
 
     private NetworkGameSelectionMatch AddMatchToList(MatchData matchData)
@@ -160,20 +179,22 @@ public class NetworkMenu : MonoBehaviour {
 public class MatchData
 {
 
-    public class SpriteAndColor
+    public class MatchPlayer
     {
         public SymbolAndSprite symbolAndSprite;
         public Color color;
+        public string playerName;
 
-        public SpriteAndColor(SymbolAndSprite symbolSprite, Color color)
+        public MatchPlayer(SymbolAndSprite symbolSprite, Color color, string playerName)
         {
             this.symbolAndSprite = symbolSprite;
             this.color = color;
+            this.playerName = playerName;
         }
     }
 
     public string matchName;
-    public List<SpriteAndColor> playersOnLobby = new List<SpriteAndColor>();
+    public List<MatchPlayer> playersOnLobby = new List<MatchPlayer>();
     public string serverAddress;
 
 
@@ -184,16 +205,18 @@ public class MatchData
         this.serverAddress = NetworkManager.singleton.networkAddress;
     }
 
-    public MatchData(NetworkBroadcastResult broadcastResult, PlayerSymbols playerSymbols) 
+    public MatchData(NetworkBroadcastResult broadcastResult, PlayerSymbols playerSymbols, string playerName) 
     {
         string[] splitted = Encoding.Unicode.GetString(broadcastResult.broadcastData).Split('_');
         matchName = splitted[0];
         string[] splittedPlayers = splitted[1].Split('|');
         for (int i = 0; i < splittedPlayers.Length; i++)
         {
-            string colorHex = splittedPlayers[i].Substring(splittedPlayers[i].Length - 6, 6);
-            string symbolName = splittedPlayers[i].Substring(0,  splittedPlayers[i].Length - 6);
 
+            string colorHex = splittedPlayers[i].Substring(splittedPlayers[i].IndexOf("c=")+2,6);
+            string symbolName = splittedPlayers[i].Substring(splittedPlayers[i].IndexOf("s=") + 2, splittedPlayers[i].IndexOf("c=") - 2);
+            string name = splittedPlayers[i].Substring(splittedPlayers[i].IndexOf("n=") + 2, splittedPlayers[i].Length - splittedPlayers[i].IndexOf("n=") - 2);
+            
             Color color;
             if (!ColorUtility.TryParseHtmlString("#" + colorHex, out color))
             {
@@ -216,7 +239,7 @@ public class MatchData
                 throw new System.Exception("broadcast sprite data error");
             }
 
-            playersOnLobby.Add(new SpriteAndColor(symbolSprite, color));
+            playersOnLobby.Add(new MatchPlayer(symbolSprite, color, name));
         }
 
         serverAddress = broadcastResult.serverAddress;
@@ -232,6 +255,8 @@ public class MatchData
                 playersData += "|";
 
             playersData += players[i].playerSymbolAndSprite.playerSymbol + ColorUtility.ToHtmlStringRGB(players[i].color);
+            playersData += "s=" + players[i].playerSymbolAndSprite.playerSymbol + "c=" + ColorUtility.ToHtmlStringRGB(players[i].color) + "n=" + players[i].playerName;
+
         }
 
         return matchName + "_" + playersData;
@@ -247,16 +272,16 @@ public class MatchData
             if (i > 0)
                 playersData += "|";
 
-            playersData += matchData.playersOnLobby[i].symbolAndSprite.playerSymbol + ColorUtility.ToHtmlStringRGB(matchData.playersOnLobby[i].color);
+            playersData += "s=" + matchData.playersOnLobby[i].symbolAndSprite.playerSymbol + "c=" + ColorUtility.ToHtmlStringRGB(matchData.playersOnLobby[i].color) + "n=" + matchData.playersOnLobby[i].playerName;
         }
 
         return matchData.matchName + "_" + playersData;
 
     }
 
-    public void AddPlayer(SpriteAndColor spriteAndColor)
+    public void AddPlayer(MatchPlayer player)
     {
-        playersOnLobby.Add(spriteAndColor);
+        playersOnLobby.Add(player);
     }
 
 

@@ -18,8 +18,6 @@ public class MenuManager : MonoBehaviour {
     public Animator numberOfPlayersAnimator;
     public Animator boardSizeAnimator;
 
-    
-
     private MenuView menuView;
 
 
@@ -35,7 +33,7 @@ public class MenuManager : MonoBehaviour {
 
     private void Start()
     {
-        menuView.UpdateView();
+        //menuView.UpdateView();
     }
 
 
@@ -70,19 +68,22 @@ public class Player
     public SymbolAndSprite playerSymbolAndSprite;
     public Color color;
     public PlayerType playerType;
+    public string playerName;
 
-    public Player(SymbolAndSprite _playerSymbolAndSprite)
+    public Player(SymbolAndSprite _playerSymbolAndSprite, string playerName = "")
     {
         playerSymbolAndSprite = _playerSymbolAndSprite;
         color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
         playerType = PlayerType.Human;
+        this.playerName = playerName;
     }
 
-    public Player(SymbolAndSprite _playerSymbolAndSprite, Color color)
+    public Player(SymbolAndSprite _playerSymbolAndSprite, Color color, string playerName = "")
     {
         playerSymbolAndSprite = _playerSymbolAndSprite;
         this.color = color;
         playerType = PlayerType.Human;
+        this.playerName = playerName;
     }
 
 }

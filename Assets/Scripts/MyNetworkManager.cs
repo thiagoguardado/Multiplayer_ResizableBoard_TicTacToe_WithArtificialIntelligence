@@ -21,7 +21,9 @@ public class MyNetworkManager : NetworkManager {
 
 
     public PlayerSymbols possibleSymbols;
-    private MatchData currentMatch;
+    public MatchData currentMatch { get; private set; }
+    public List<int> currentConnectionsIDs = new List<int>();
+    public string playerName = "Player";
 
     public bool isConnected { get; private set; }
 
@@ -63,14 +65,21 @@ public class MyNetworkManager : NetworkManager {
 
     public override void OnServerConnect(NetworkConnection conn)
     {
-        currentMatch.AddPlayer(new MatchData.SpriteAndColor(possibleSymbols.possiblePlayerSprites[2], Color.yellow));
+        currentConnectionsIDs.Add(conn.connectionId);
+        currentMatch.AddPlayer(new MatchData.MatchPlayer(possibleSymbols.possiblePlayerSprites[0], Color.red, ""));
         RefreshBroadcastInfo();
+
+        NetworkGameLobbyView netView = GetComponent<NetworkGameLobbyView>();
+        if (netView != null)
+        {
+            netView.UpdateView();
+        }
 
     }
 
     public override void OnServerDisconnect(NetworkConnection conn)
     {
-
+        currentConnectionsIDs.Remove(conn.connectionId);
         currentMatch.RemovePlayer();
         RefreshBroadcastInfo();
     }

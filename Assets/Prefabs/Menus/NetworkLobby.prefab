@@ -216,7 +216,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4670411347623244}
-  - component: {fileID: 114276105352051014}
+  - component: {fileID: 114680534375557802}
   m_Layer: 0
   m_Name: NetworkLobby
   m_TagString: Untagged
@@ -349,7 +349,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1705897974834710}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -168, z: 0}
+  m_LocalPosition: {x: 0, y: -79, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 224017079274711886}
@@ -547,7 +547,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1326756910357518}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 1392445389, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
   m_Name: 
@@ -796,17 +796,6 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &114276105352051014
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1639440917015706}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7d666f11809dd47b28f57b2a05f686, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114323465712855156
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1125,6 +1114,24 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: PLAY!
+--- !u!114 &114680534375557802
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1639440917015706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a005c99208c556c4cb15fdc15f1738f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerBoxPrefab: {fileID: 114147151314450218, guid: 7221eaa9b06e5fc43b9d917b78c796b1,
+    type: 2}
+  boardSize: {fileID: 114168668424960112}
+  boardSizeGreaterSign: {fileID: 114399780570511090}
+  boardSizeLesserSign: {fileID: 114384488637510362}
+  signColorWhenDisabled: {r: 0.33088237, g: 0.33088237, b: 0.33088237, a: 0}
+  menuPlayerBoxesCenter: {fileID: 4595160236111300}
 --- !u!114 &114754521980235758
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1197,7 +1204,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114276105352051014}
+      - m_Target: {fileID: 114680534375557802}
         m_MethodName: BackButton
         m_Mode: 1
         m_Arguments:

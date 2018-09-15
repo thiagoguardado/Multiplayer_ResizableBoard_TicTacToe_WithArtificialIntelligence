@@ -39,11 +39,20 @@ public class MenuPlayerBox : MonoBehaviour {
                 label.text = type.ToString();
                 break;
         }
-
-        
         index = _index;
         menuView = _menuView;
     }
+
+    public void Setup(Sprite sprite, Color color, string playerName, int _index, MenuView _menuView)
+    {
+        image.sprite = sprite;
+        image.color = color;
+        label.text = playerName;
+        index = _index;
+        menuView = _menuView;
+    }
+
+
 
     public void ChangeColor()
     {

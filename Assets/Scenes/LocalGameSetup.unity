@@ -1106,8 +1106,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1935393260}
   - component: {fileID: 1935393259}
-  - component: {fileID: 1935393261}
   - component: {fileID: 1935393262}
+  - component: {fileID: 1935393263}
   m_Layer: 0
   m_Name: MenuManager
   m_TagString: Untagged
@@ -1144,27 +1144,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1935393261
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1935393258}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0c64d89ae6c99844be7f7ab6b3ff88c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerBoxPrefab: {fileID: 114147151314450218, guid: 7221eaa9b06e5fc43b9d917b78c796b1,
-    type: 2}
-  numberOfPlayers: {fileID: 256180281}
-  numberOfPlayersGreaterSign: {fileID: 1665932213}
-  numberOfPlayersLesserSign: {fileID: 1054691862}
-  boardSize: {fileID: 1047587565}
-  boardSizeGreaterSign: {fileID: 2027987062}
-  boardSizeLesserSign: {fileID: 1410207091}
-  signColorWhenDisabled: {r: 1, g: 1, b: 1, a: 0.141}
-  menuPlayerBoxesCenter: {fileID: 1899307798}
 --- !u!114 &1935393262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1176,6 +1155,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8be6cef9f033ba47ba1cf40f75f458b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1935393263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1935393258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2a4880ca74b7fc44aeb87b1efbc8412, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerBoxPrefab: {fileID: 114147151314450218, guid: 7221eaa9b06e5fc43b9d917b78c796b1,
+    type: 2}
+  numberOfPlayers: {fileID: 256180281}
+  numberOfPlayersGreaterSign: {fileID: 1665932213}
+  numberOfPlayersLesserSign: {fileID: 1054691862}
+  boardSize: {fileID: 1047587565}
+  boardSizeGreaterSign: {fileID: 2027987062}
+  boardSizeLesserSign: {fileID: 1410207091}
+  signColorWhenDisabled: {r: 0.30147058, g: 0.30147058, b: 0.30147058, a: 0}
+  menuPlayerBoxesCenter: {fileID: 1899307798}
 --- !u!114 &2027987062 stripped
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 114145956534644142, guid: 42aa921e03cc4ed419de1dfb85cc2187,

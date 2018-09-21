@@ -218,7 +218,7 @@ GameObject:
   - component: {fileID: 4670411347623244}
   - component: {fileID: 114680534375557802}
   m_Layer: 0
-  m_Name: NetworkLobby
+  m_Name: NetworkLobbyView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1132,6 +1132,7 @@ MonoBehaviour:
   boardSizeLesserSign: {fileID: 114384488637510362}
   signColorWhenDisabled: {r: 0.33088237, g: 0.33088237, b: 0.33088237, a: 0}
   menuPlayerBoxesCenter: {fileID: 4595160236111300}
+  possibleSymbols: {fileID: 11400000, guid: ca1a8b7f57777404ca10417420c30d46, type: 2}
 --- !u!114 &114754521980235758
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,13 +10,14 @@ public class NetworkGameSelectionMatch : MonoBehaviour {
     public Text matchName;
     public int maxCharsInName = 15;
     public List<Image> playerSymbols = new List<Image>();
+    public PlayerSymbols possibleSymbols;
 
     public void Setup(MatchData _matchData)
     {
         thisMatchData = _matchData;
 
         SetName(thisMatchData.matchName);
-        SetPlayers(thisMatchData.playersOnLobby);
+        SetPlayers(thisMatchData.playersOnLobby.ToList());
 
     }
 
@@ -24,7 +26,7 @@ public class NetworkGameSelectionMatch : MonoBehaviour {
         matchName.text = newName.Substring(0, Mathf.Min(newName.Length,maxCharsInName));
     }
 
-    private void SetPlayers(List<MatchData.MatchPlayer> players)
+    private void SetPlayers(List<MatchPlayer> players)
     {
         foreach (Image image in playerSymbols)
         {
@@ -34,7 +36,7 @@ public class NetworkGameSelectionMatch : MonoBehaviour {
         for (int i = 0; i < players.Count; i++)
         {
             playerSymbols[i].gameObject.SetActive(true);
-            playerSymbols[i].sprite = players[i].symbolAndSprite.playerSprite;
+            playerSymbols[i].sprite = possibleSymbols.GetSprite(players[i].playerSymbol);
             playerSymbols[i].color = players[i].color;
 
 

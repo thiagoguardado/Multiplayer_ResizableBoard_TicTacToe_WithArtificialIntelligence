@@ -7,6 +7,17 @@ public class PlayerSymbols : ScriptableObject {
 
     public List<SymbolAndSprite> possiblePlayerSprites;
 
+    public Sprite GetSprite(PlayerSymbol symbol)
+    {
+        for (int i = 0; i < possiblePlayerSprites.Count; i++)
+        {
+            if (possiblePlayerSprites[i].playerSymbol == symbol)
+                return possiblePlayerSprites[i].playerSprite;
+        }
+
+        return null;
+    }
+
 }
 
 [System.Serializable]

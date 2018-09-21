@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -10,24 +11,26 @@ using UnityEngine.UI;
 /// </summary>
 public class NetworkGameLobbyView : MenuView
 {
-    MyNetworkManager mynetworkManager;
-
-    void Start()
-    {
-        mynetworkManager = UnityEngine.Networking.NetworkManager.singleton.GetComponent<MyNetworkManager>();
-        if (mynetworkManager != null)
-        {
-            Debug.Log("encontrou");
-        }
-    }
+    NetworkGameLobby lobbyPrefab;
+    NetworkGameLobby lobby;
+    public PlayerSymbols possibleSymbols;
 
     void Update()
     {
-        UpdateView();
+        if (lobby == null)
+        {
+            lobby = GameObject.FindObjectOfType<NetworkGameLobby>();
+        }
+        else
+        {
+            UpdateView();
+        }
+
     }
 
     public override void UpdateView()
     {
+
         UpdateBoardSize();
         UpdateMenuPlayerBoxes();
     }
@@ -66,17 +69,20 @@ public class NetworkGameLobbyView : MenuView
     protected override void UpdateMenuPlayerBoxes()
     {
         // check if number of player boxes is equal to players
-
-        if (menuPlayerBoxes.Count != mynetworkManager.currentMatch.playersOnLobby.Count)
+        if (lobby != null)
         {
-            CreateNewPlayerBoxes();
-        }
 
-        for (int i = 0; i < mynetworkManager.currentMatch.playersOnLobby.Count; i++)
-        {
-            MatchData.MatchPlayer p = mynetworkManager.currentMatch.playersOnLobby[i];
-            menuPlayerBoxes[i].Setup(p.symbolAndSprite.playerSprite, p.color, p.playerName, i, this);
+            if (menuPlayerBoxes.Count != lobby.mynetworkManager.currentMatch.playersOnLobby.Length)
+            {
+                CreateNewPlayerBoxes();
+            }
 
+            for (int i = 0; i < lobby.mynetworkManager.currentMatch.playersOnLobby.Length; i++)
+            {
+                MatchPlayer p = lobby.mynetworkManager.currentMatch.playersOnLobby[i];
+                menuPlayerBoxes[i].Setup(possibleSymbols.GetSprite(p.playerSymbol), p.color, p.playerName, i, this);
+
+            }
         }
     }
 
@@ -89,10 +95,10 @@ public class NetworkGameLobbyView : MenuView
 
         menuPlayerBoxes.Clear();
 
-        for (int i = 0; i < mynetworkManager.currentMatch.playersOnLobby.Count; i++)
+        for (int i = 0; i < lobby.mynetworkManager.currentMatch.playersOnLobby.Length; i++)
         {
             MenuPlayerBox go = Instantiate(playerBoxPrefab, menuPlayerBoxesCenter.position, Quaternion.identity, menuPlayerBoxesCenter);
-            go.transform.localPosition = new Vector3((i - ((float)mynetworkManager.currentMatch.playersOnLobby.Count - 1) / 2f) * 450f, 0, 0);
+            go.transform.localPosition = new Vector3((i - ((float)lobby.mynetworkManager.currentMatch.playersOnLobby.Length - 1) / 2f) * 450f, 0, 0);
             menuPlayerBoxes.Add(go);
         }
 
@@ -104,7 +110,7 @@ public class NetworkGameLobbyView : MenuView
 
         if (!MyNetworkManager.Discovery.isServer)
         {
-            mynetworkManager.StopClient();
+            lobby.mynetworkManager.StopClient();
 
             SceneManager.LoadScene("TitleScreen");
 
@@ -112,7 +118,7 @@ public class NetworkGameLobbyView : MenuView
         else
         {
 
-            mynetworkManager.StopHost();
+            lobby.mynetworkManager.StopHost();
             MyNetworkManager.Discovery.StopBroadcast();
             SceneManager.LoadScene("TitleScreen");
         }

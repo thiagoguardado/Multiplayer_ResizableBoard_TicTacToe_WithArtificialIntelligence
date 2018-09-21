@@ -21,7 +21,7 @@ public class MyNetworkManager : NetworkManager {
 
 
     public PlayerSymbols possibleSymbols;
-    public MatchData currentMatch { get; private set; }
+    public MatchData currentMatch;
     public List<int> currentConnectionsIDs = new List<int>();
     public string playerName = "Player";
 
@@ -49,6 +49,7 @@ public class MyNetworkManager : NetworkManager {
         currentMatch = new MatchData(newMatchName, singleton.networkAddress);
         singleton.StartHost();
         isConnected = true;
+
         UnityEngine.SceneManagement.SceneManager.LoadScene("NetworkGameLobby");
 
     }
@@ -62,11 +63,10 @@ public class MyNetworkManager : NetworkManager {
         UnityEngine.SceneManagement.SceneManager.LoadScene("NetworkGameLobby");
     }
 
-
     public override void OnServerConnect(NetworkConnection conn)
     {
         currentConnectionsIDs.Add(conn.connectionId);
-        currentMatch.AddPlayer(new MatchData.MatchPlayer(possibleSymbols.possiblePlayerSprites[0], Color.red, ""));
+        currentMatch.AddPlayer(new MatchPlayer(possibleSymbols.possiblePlayerSprites[0].playerSymbol, Color.red, "", conn.connectionId));
         RefreshBroadcastInfo();
 
         NetworkGameLobbyView netView = GetComponent<NetworkGameLobbyView>();

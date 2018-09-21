@@ -175,29 +175,13 @@ public class NetworkMenu : MonoBehaviour {
 
 }
 
-
+[System.Serializable]
 public class MatchData
 {
 
-    public class MatchPlayer
-    {
-        public SymbolAndSprite symbolAndSprite;
-        public Color color;
-        public string playerName;
-
-        public MatchPlayer(SymbolAndSprite symbolSprite, Color color, string playerName)
-        {
-            this.symbolAndSprite = symbolSprite;
-            this.color = color;
-            this.playerName = playerName;
-        }
-    }
-
     public string matchName;
-    public List<MatchPlayer> playersOnLobby = new List<MatchPlayer>();
+    [SerializeField] public MatchPlayer[] playersOnLobby;
     public string serverAddress;
-
-
 
     public MatchData(string matchName, string serverAddress)
     {
@@ -224,22 +208,23 @@ public class MatchData
             }
 
 
-            SymbolAndSprite symbolSprite = null;
+            PlayerSymbol symbol = PlayerSymbol.Circle;
+            bool findSymbol = false;
             for (int j = 0; j < playerSymbols.possiblePlayerSprites.Count; j++)
             {
                 if (playerSymbols.possiblePlayerSprites[j].playerSymbol.ToString() == symbolName)
                 {
 
-                    symbolSprite = playerSymbols.possiblePlayerSprites[j];
+                    symbol = playerSymbols.possiblePlayerSprites[j].playerSymbol;
+                    findSymbol = true;
                     break;
                 }
             }
-            if (symbolSprite == null)
+            if (!findSymbol)
             {
                 throw new System.Exception("broadcast sprite data error");
             }
-
-            playersOnLobby.Add(new MatchPlayer(symbolSprite, color, name));
+            playersOnLobby = new MatchPlayer[] { new MatchPlayer(symbol, color, name, -1) };
         }
 
         serverAddress = broadcastResult.serverAddress;
@@ -267,12 +252,12 @@ public class MatchData
     {
 
         string playersData = "";
-        for (int i = 0; i < matchData.playersOnLobby.Count; i++)
+        for (int i = 0; i < matchData.playersOnLobby.Length; i++)
         {
             if (i > 0)
                 playersData += "|";
 
-            playersData += "s=" + matchData.playersOnLobby[i].symbolAndSprite.playerSymbol + "c=" + ColorUtility.ToHtmlStringRGB(matchData.playersOnLobby[i].color) + "n=" + matchData.playersOnLobby[i].playerName;
+            playersData += "s=" + matchData.playersOnLobby[i].playerSymbol + "c=" + ColorUtility.ToHtmlStringRGB(matchData.playersOnLobby[i].color) + "n=" + matchData.playersOnLobby[i].playerName;
         }
 
         return matchData.matchName + "_" + playersData;
@@ -281,12 +266,39 @@ public class MatchData
 
     public void AddPlayer(MatchPlayer player)
     {
-        playersOnLobby.Add(player);
+        if (playersOnLobby != null)
+        {
+            List<MatchPlayer> m = playersOnLobby.ToList<MatchPlayer>();
+            m.Add(player);
+            playersOnLobby = m.ToArray();
+        }
+        else {
+            playersOnLobby = new MatchPlayer[] { player };
+        }
     }
 
 
     public void RemovePlayer()
     {
-        playersOnLobby.RemoveAt(playersOnLobby.Count);
+        List<MatchPlayer> m = playersOnLobby.ToList<MatchPlayer>();
+        m.RemoveAt(playersOnLobby.Length);
+        playersOnLobby = m.ToArray();
+    }
+}
+
+[System.Serializable]
+public class MatchPlayer
+{
+    public PlayerSymbol playerSymbol;
+    public Color color;
+    public string playerName;
+    public int connectionID;
+
+    public MatchPlayer(PlayerSymbol playerSymbol, Color color, string playerName, int connectionID)
+    {
+        this.playerSymbol = playerSymbol;
+        this.color = color;
+        this.playerName = playerName;
+        this.connectionID = connectionID;
     }
 }

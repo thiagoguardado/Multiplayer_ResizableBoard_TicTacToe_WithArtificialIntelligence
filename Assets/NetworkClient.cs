@@ -5,19 +5,20 @@ using UnityEngine.Networking;
 
 public class NetworkClient : NetworkBehaviour {
 
-    public MatchData.MatchPlayer player;
+    public MatchPlayer player;
     MyNetworkManager mynetwork;
 
-    void Awake()
+    void Start()
     {
         mynetwork = NetworkManager.singleton.GetComponent<MyNetworkManager>();
-
-       
     }
 
-    void Initialize(MatchData.MatchPlayer player)
+    void Initialize(MatchPlayer player)
     {
         this.player = player;
     }
+
+
+
 
 }

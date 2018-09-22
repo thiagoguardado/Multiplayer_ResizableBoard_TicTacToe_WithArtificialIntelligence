@@ -23,6 +23,7 @@ public class NetworkGameSelectionMatch : MonoBehaviour {
 
     private void SetName(string newName)
     {
+        Debug.Log(newName);
         matchName.text = newName.Substring(0, Mathf.Min(newName.Length,maxCharsInName));
     }
 

@@ -49,4 +49,8 @@ public class PopupPanel : MonoBehaviour {
         buttonAction.Invoke(inputField.text);
     }
 
+    public void Cancel()
+    {
+        ClosePopup();
+    }
 }

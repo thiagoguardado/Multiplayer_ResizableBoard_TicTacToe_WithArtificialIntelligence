@@ -61,7 +61,7 @@ MonoBehaviour:
   m_ScriptCRCCheck: 1
   m_MaxDelay: 0.01
   m_LogLevel: 2
-  m_PlayerPrefab: {fileID: 1356588019135256, guid: 049c690b943695e4db7114dc3f21fe46,
+  m_PlayerPrefab: {fileID: 1973026296667244, guid: 1052468440285bd4f9285a6c4bf832cb,
     type: 2}
   m_AutoCreatePlayer: 1
   m_PlayerSpawnMethod: 0
@@ -124,6 +124,10 @@ MonoBehaviour:
   isNetworkActive: 0
   matchMaker: {fileID: 0}
   possibleSymbols: {fileID: 11400000, guid: ca1a8b7f57777404ca10417420c30d46, type: 2}
+  currentMatch:
+    matchName: 
+    playersOnLobby: []
+    serverAddress: 
   currentConnectionsIDs: 
   playerName: Player
 --- !u!114 &114660800717553030
@@ -138,7 +142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BroadcastPort: 47777
-  m_BroadcastKey: 2222
+  m_BroadcastKey: 150890
   m_BroadcastVersion: 1
   m_BroadcastSubVersion: 1
   m_BroadcastInterval: 1000

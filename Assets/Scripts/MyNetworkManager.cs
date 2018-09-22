@@ -65,9 +65,11 @@ public class MyNetworkManager : NetworkManager {
 
     public override void OnServerConnect(NetworkConnection conn)
     {
+        base.OnServerConnect(conn);
+
         currentConnectionsIDs.Add(conn.connectionId);
         currentMatch.AddPlayer(new MatchPlayer(possibleSymbols.possiblePlayerSprites[0].playerSymbol, Color.red, "", conn.connectionId));
-        RefreshBroadcastInfo();
+        StartCoroutine(RefreshBroadcastInfo());
 
         NetworkGameLobbyView netView = GetComponent<NetworkGameLobbyView>();
         if (netView != null)
@@ -75,21 +77,58 @@ public class MyNetworkManager : NetworkManager {
             netView.UpdateView();
         }
 
+        if (currentMatch.playersOnLobby.Length >= 4)
+        {
+            //Stop broadcast
+            Discovery.StopBroadcast();
+        }
+
+    }
+
+    public override void OnClientConnect(NetworkConnection conn)
+    {
+        base.OnClientConnect(conn);
+
+        if (!NetworkServer.active)
+        {
+            Discovery.StopBroadcast();
+        }
+    }
+
+    public override void OnClientDisconnect(NetworkConnection conn)
+    {
+        Debug.Log("Server disconnected");
+        DiscconectAll();
     }
 
     public override void OnServerDisconnect(NetworkConnection conn)
     {
         currentConnectionsIDs.Remove(conn.connectionId);
-        currentMatch.RemovePlayer();
-        RefreshBroadcastInfo();
+        currentMatch.RemovePlayer(conn.connectionId);
+
+        if (currentMatch.playersOnLobby.Length <4)
+        {
+            //restart broadcast
+            StartCoroutine(RefreshBroadcastInfo());
+        }
+
     }
 
-    private void RefreshBroadcastInfo()
+    private IEnumerator RefreshBroadcastInfo()
     {
         Discovery.StopBroadcast();
         Discovery.broadcastData = MatchData.CreateMatchBroadcastData(currentMatch);
+        yield return null;
         Discovery.StartAsServer();
     }
 
 
+    public static void DiscconectAll()
+    {
+        singleton.StopClient();
+        singleton.StopHost();
+        singleton.StopMatchMaker();
+        Discovery.StopBroadcast();
+        Network.Disconnect();
+    }
 }

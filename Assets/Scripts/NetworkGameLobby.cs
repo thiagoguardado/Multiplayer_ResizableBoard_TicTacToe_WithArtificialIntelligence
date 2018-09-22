@@ -7,6 +7,7 @@ public class NetworkGameLobby : NetworkBehaviour {
 
     public MyNetworkManager mynetworkManager { get; private set; }
     float timer = 1f;
+    float refreshTime = 1f;
 
     private void Awake()
     {
@@ -20,20 +21,24 @@ public class NetworkGameLobby : NetworkBehaviour {
         mynetworkManager = NetworkManager.singleton.GetComponent<MyNetworkManager>();
        
     }
-    /*
 
     void Update()
     {
-
-        Debug.Log("oi");
-
-        if (isServer)
+        if (isLocalPlayer)
         {
-            ServerUpdate();
-        }
-        else if (isClient)
-        {
-            ClientUpdate();
+            timer -= Time.deltaTime;
+            if (timer <= 0f)
+            {
+                timer = refreshTime;
+                if (isServer)
+                {
+                    ServerUpdate();
+                }
+                else if (isClient)
+                {
+                    ClientUpdate();
+                }
+            }
         }
 
     }
@@ -96,5 +101,5 @@ public class NetworkGameLobby : NetworkBehaviour {
     {
         RpcSendMatchDataToClients(mynetworkManager.currentMatch);
     }
-    */
+    
 }

@@ -11,15 +11,39 @@ using UnityEngine.UI;
 /// </summary>
 public class NetworkGameLobbyView : MenuView
 {
-    NetworkGameLobby lobbyPrefab;
     NetworkGameLobby lobby;
     public PlayerSymbols possibleSymbols;
+
+    public Button playButton;
+    public Button lessSignButton;
+    public Button greaterSignButton;
+
+    public bool onlyClient = false;
+
+
+    void Start()
+    {
+        // se cliente
+        if (NetworkClient.active && !NetworkServer.active)
+        {
+            onlyClient = true;
+        }
+
+        if (onlyClient)
+        {
+            playButton.interactable = false;
+            lessSignButton.gameObject.SetActive(false);
+            greaterSignButton.gameObject.SetActive(false);
+        }
+
+    }
+
 
     void Update()
     {
         if (lobby == null)
         {
-            lobby = GameObject.FindObjectOfType<NetworkGameLobby>();
+            lobby = FindObjectOfType<NetworkGameLobby>();
         }
         else
         {

@@ -30,6 +30,7 @@ public class NetworkMenu : MonoBehaviour {
     private void Start()
     {
         myNetwork.StartLookingForMatches();
+        playerNameDisplay.text = myNetwork.playerName;
     }
 
     private void Update()
@@ -41,8 +42,9 @@ public class NetworkMenu : MonoBehaviour {
 
             if (refreshListTimer <= 0f)
             {
-                RefreshGames();
                 refreshListTimer = refreshListTime;
+                RefreshGames();
+                
             }
 
         }
@@ -55,8 +57,8 @@ public class NetworkMenu : MonoBehaviour {
 
         foreach (NetworkBroadcastResult result in MyNetworkManager.Discovery.broadcastsReceived.Values)
         {
-
             string matchData = Encoding.Unicode.GetString(result.broadcastData);
+
             MatchData match;
             
             try
@@ -183,6 +185,9 @@ public class MatchData
     [SerializeField] public MatchPlayer[] playersOnLobby;
     public string serverAddress;
 
+    public MatchData() { }
+
+
     public MatchData(string matchName, string serverAddress)
     {
         this.matchName = matchName;
@@ -278,11 +283,24 @@ public class MatchData
     }
 
 
-    public void RemovePlayer()
+    public void RemovePlayer(int connectionID)
     {
         List<MatchPlayer> m = playersOnLobby.ToList<MatchPlayer>();
-        m.RemoveAt(playersOnLobby.Length);
-        playersOnLobby = m.ToArray();
+        int i = -1;
+        for (i = 0; i < m.Count; i++)
+        {
+            if (m[i].connectionID == connectionID)
+                break;
+        }
+        if (i == -1)
+        {
+            Debug.Log("Could not remove player from lobby");
+        }
+        else {
+            m.RemoveAt(i);
+            playersOnLobby = m.ToArray();
+        }
+       
     }
 }
 
@@ -293,6 +311,9 @@ public class MatchPlayer
     public Color color;
     public string playerName;
     public int connectionID;
+
+    public MatchPlayer() { }
+
 
     public MatchPlayer(PlayerSymbol playerSymbol, Color color, string playerName, int connectionID)
     {

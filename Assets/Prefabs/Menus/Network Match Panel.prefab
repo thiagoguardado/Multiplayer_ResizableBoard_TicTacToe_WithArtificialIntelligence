@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 95300157976511430}
   - component: {fileID: 114415337690011614}
   m_Layer: 5
-  m_Name: Match Panel
+  m_Name: Network Match Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -366,6 +366,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b55222304ec9c294389004d8e46672aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  thisMatchData:
+    matchName: 
+    playersOnLobby: []
+    serverAddress: 
   matchName: {fileID: 114537299239182616}
   maxCharsInName: 15
   playerSymbols:
@@ -373,6 +377,7 @@ MonoBehaviour:
   - {fileID: 114609224058916948}
   - {fileID: 114343579237680120}
   - {fileID: 114840399598016688}
+  possibleSymbols: {fileID: 11400000, guid: ca1a8b7f57777404ca10417420c30d46, type: 2}
 --- !u!114 &114439643753025662
 MonoBehaviour:
   m_ObjectHideFlags: 1

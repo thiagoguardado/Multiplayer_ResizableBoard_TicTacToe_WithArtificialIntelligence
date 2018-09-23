@@ -322,4 +322,26 @@ public class MatchPlayer
         this.playerName = playerName;
         this.connectionID = connectionID;
     }
+
+    public MatchPlayer(string playerName, int connectionID)
+    {
+        this.playerName = playerName;
+        this.connectionID = connectionID;
+    }
+
+    public MatchPlayer(int connectionID, bool random)
+    {
+        if(!random) 
+        {
+            this.playerSymbol = PlayerSymbol.Circle;
+            this.color = Color.red;
+
+        } else 
+        {
+            this.playerSymbol = (PlayerSymbol)UnityEngine.Random.Range(0, Enum.GetValues(typeof(PlayerSymbol)).Length);
+            this.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, 1);
+        }
+        this.playerName = "";
+        this.connectionID = connectionID;
+    }
 }

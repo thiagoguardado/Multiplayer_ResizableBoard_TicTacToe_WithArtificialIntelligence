@@ -24,22 +24,22 @@ public class NetworkGameLobby : NetworkBehaviour {
 
     void Update()
     {
-        if (isLocalPlayer)
+
+        timer -= Time.deltaTime;
+        if (timer <= 0f)
         {
-            timer -= Time.deltaTime;
-            if (timer <= 0f)
+            timer = refreshTime;
+            if (isServer)
             {
-                timer = refreshTime;
-                if (isServer)
-                {
-                    ServerUpdate();
-                }
-                else if (isClient)
-                {
-                    ClientUpdate();
-                }
+                ServerUpdate();
             }
-        }
+
+            if (isClient)
+            {
+                ClientUpdate();
+            }
+        }       
+
 
     }
 
@@ -57,43 +57,54 @@ public class NetworkGameLobby : NetworkBehaviour {
 
     private void UpdatePlayersNameOnServer()
     {
-        for (int i = 0; i < mynetworkManager.currentMatch.playersOnLobby.Length; i++)
-        {
-            if (mynetworkManager.currentMatch.playersOnLobby[i].playerName == "")
-            {
 
-                RpcAskPlayerForName(i);
-            }
-        }
+        RpcAskPlayerForName();
+
     }
 
     private void UpdatePlayersOnClient()
     {
-        if (timer <= 0f)
-        {
+        if(isLocalPlayer)
             CmdUpdateMatchData();
-        }
-        timer -= Time.deltaTime;
     }
 
 
     [ClientRpc]
-    private void RpcAskPlayerForName(int index)
+    private void RpcAskPlayerForName()
     {
-        CmdUpdatePlayerName(mynetworkManager.playerName, index);
+        if(isLocalPlayer)
+            CmdUpdatePlayerName(mynetworkManager.currentPlayer);
     }
 
     [Command]
-    private void CmdUpdatePlayerName(string playerName, int index)
+    private void CmdUpdatePlayerName(MatchPlayer player)
     {
-        mynetworkManager.currentMatch.playersOnLobby[index].playerName = playerName;
+        for (int i = 0; i < mynetworkManager.currentMatch.playersOnLobby.Length; i++)
+        {
+            if (mynetworkManager.currentMatch.playersOnLobby[i].connectionID == player.connectionID)
+            {
+                mynetworkManager.currentMatch.playersOnLobby[i].playerName = player.playerName;
+                break;
+            }
+        }
     }
 
 
     [ClientRpc]
     private void RpcSendMatchDataToClients(MatchData currentMatchData)
     {
-        mynetworkManager.currentMatch = currentMatchData;
+        if(!NetworkServer.active)
+            mynetworkManager.currentMatch = currentMatchData;
+
+        for (int i = 0; i < currentMatchData.playersOnLobby.Length; i++)
+        {
+            if (currentMatchData.playersOnLobby[i].connectionID == mynetworkManager.currentPlayer.connectionID)
+            {
+                mynetworkManager.currentPlayer.playerSymbol = currentMatchData.playersOnLobby[i].playerSymbol;
+                mynetworkManager.currentPlayer.color = currentMatchData.playersOnLobby[i].color;
+                break;
+            }
+        }
     }
 
     [Command]

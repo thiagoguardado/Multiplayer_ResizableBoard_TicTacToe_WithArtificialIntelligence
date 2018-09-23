@@ -5,7 +5,8 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class PopupPanel : MonoBehaviour {
+public class PopupPanel : MonoBehaviour
+{
 
     public Text title;
     public InputField inputField;
@@ -19,7 +20,16 @@ public class PopupPanel : MonoBehaviour {
         button.onClick.AddListener(ButtonClicked);
     }
 
-    private void OpenPopup(string titleText, string inputFieldHint, string inputText, UnityAction<string> buttonAction )
+    private void Update()
+    {
+        if (inputField.isFocused && inputField.text != "" && Input.GetKey(KeyCode.Return))
+        {
+            button.onClick.Invoke();
+        }
+
+    }
+
+    private void OpenPopup(string titleText, string inputFieldHint, string inputText, UnityAction<string> buttonAction)
     {
         this.buttonAction = buttonAction;
         mainPanel.SetActive(true);

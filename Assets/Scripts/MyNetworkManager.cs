@@ -24,6 +24,7 @@ public class MyNetworkManager : NetworkManager {
     public MatchData currentMatch;
     public List<int> currentConnectionsIDs = new List<int>();
     public string playerName = "Player";
+    public MatchPlayer currentPlayer;
 
     public bool isConnected { get; private set; }
 
@@ -68,7 +69,7 @@ public class MyNetworkManager : NetworkManager {
         base.OnServerConnect(conn);
 
         currentConnectionsIDs.Add(conn.connectionId);
-        currentMatch.AddPlayer(new MatchPlayer(possibleSymbols.possiblePlayerSprites[0].playerSymbol, Color.red, "", conn.connectionId));
+        currentMatch.AddPlayer(new MatchPlayer(conn.connectionId, true));
         StartCoroutine(RefreshBroadcastInfo());
 
         NetworkGameLobbyView netView = GetComponent<NetworkGameLobbyView>();
@@ -93,13 +94,23 @@ public class MyNetworkManager : NetworkManager {
         {
             Discovery.StopBroadcast();
         }
+
+        currentPlayer = new MatchPlayer(playerName,conn.connectionId);
     }
+
 
     public override void OnClientDisconnect(NetworkConnection conn)
     {
         Debug.Log("Server disconnected");
-        DiscconectAll();
+
+        currentPlayer = null;
+
+        ClientDisconnectAll();
+
+        GameManager.Instance.ReturnToMenu();
+
     }
+
 
     public override void OnServerDisconnect(NetworkConnection conn)
     {
@@ -122,8 +133,15 @@ public class MyNetworkManager : NetworkManager {
         Discovery.StartAsServer();
     }
 
+    public static void ClientDisconnectAll()
+    {
+        singleton.StopClient();
+        singleton.StopHost();
+        singleton.StopMatchMaker();
+        Network.Disconnect();
+    }
 
-    public static void DiscconectAll()
+    public static void ServerDiscconectAll()
     {
         singleton.StopClient();
         singleton.StopHost();

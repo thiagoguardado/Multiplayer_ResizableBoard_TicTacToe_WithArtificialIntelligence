@@ -18,10 +18,16 @@ public class NetworkLobbyController : MonoBehaviour {
 
     public void Return()
     {
-        MyNetworkManager.DiscconectAll();
-        GameManager.Instance.ReturnToTitleScreen();
+        if (NetworkServer.active)
+        {
+            MyNetworkManager.ServerDiscconectAll();
+        }
+        else
+        {
+            MyNetworkManager.ClientDisconnectAll();
+        }
 
-        Debug.Log("Back");
+        GameManager.Instance.ReturnToTitleScreen();
     }
 
 

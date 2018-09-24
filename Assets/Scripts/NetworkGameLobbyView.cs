@@ -19,7 +19,7 @@ public class NetworkGameLobbyView : MenuView
     public Button greaterSignButton;
 
     public bool onlyClient = false;
-
+    public MyNetworkManager myNetworkManager { get; private set; }
 
     void Start()
     {
@@ -35,6 +35,8 @@ public class NetworkGameLobbyView : MenuView
             lessSignButton.gameObject.SetActive(false);
             greaterSignButton.gameObject.SetActive(false);
         }
+
+        myNetworkManager = NetworkManager.singleton.GetComponent<MyNetworkManager>();
 
     }
 
@@ -103,8 +105,8 @@ public class NetworkGameLobbyView : MenuView
 
             for (int i = 0; i < lobby.mynetworkManager.currentMatch.playersOnLobby.Length; i++)
             {
-                MatchPlayer p = lobby.mynetworkManager.currentMatch.playersOnLobby[i];
-                menuPlayerBoxes[i].Setup(possibleSymbols.GetSprite(p.playerSymbol), p.color, p.playerName, i, this);
+                NetworkPlayer p = lobby.mynetworkManager.currentMatch.playersOnLobby[i];
+                ((NetworkLobbyPlayerBox)menuPlayerBoxes[i]).Setup(possibleSymbols.GetSprite(p.playerSymbol), p.color, p.playerName, p.connectionID, this);
 
             }
         }
@@ -121,7 +123,7 @@ public class NetworkGameLobbyView : MenuView
 
         for (int i = 0; i < lobby.mynetworkManager.currentMatch.playersOnLobby.Length; i++)
         {
-            MenuPlayerBox go = Instantiate(playerBoxPrefab, menuPlayerBoxesCenter.position, Quaternion.identity, menuPlayerBoxesCenter);
+            NetworkLobbyPlayerBox go = Instantiate(playerBoxPrefab as NetworkLobbyPlayerBox, menuPlayerBoxesCenter.position, Quaternion.identity, menuPlayerBoxesCenter);
             go.transform.localPosition = new Vector3((i - ((float)lobby.mynetworkManager.currentMatch.playersOnLobby.Length - 1) / 2f) * 450f, 0, 0);
             menuPlayerBoxes.Add(go);
         }

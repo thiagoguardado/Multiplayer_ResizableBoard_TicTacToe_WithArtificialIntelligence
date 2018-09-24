@@ -12,7 +12,7 @@ public class MenuPlayerBox : MonoBehaviour {
     public Image image;
     public Text label;
     private int index;
-    private MenuView menuView;
+    protected MenuView menuView;
     public Animator imageAnimator;
     public Animator textAnimator;
 

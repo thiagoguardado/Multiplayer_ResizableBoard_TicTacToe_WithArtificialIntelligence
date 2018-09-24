@@ -30,7 +30,9 @@ public class GameManager : MonoBehaviour {
     public static List<Player> players = new List<Player>();// current list of players
 
     public static bool initialized = false; // if game manager has been initialized
-    
+
+    public PlayerSymbols possiblePlayerSymbols;
+
     private void Awake()
     {
         // singleton
@@ -106,6 +108,19 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+
+    public void NetworkInitialize()
+    {
+        if (!initialized)
+        {
+            // setup board
+            boardSize = 3;
+            numberOfPlayers = 0;
+
+            initialized = true;
+        }
+    }
+
     /// <summary>
     /// Change number of players
     /// </summary>
@@ -162,6 +177,16 @@ public class GameManager : MonoBehaviour {
             }
         }
         return false;
+    }
+
+    public void SetNetworkPlayers(NetworkPlayer[] netPlayers){
+        players.Clear();
+        for (int i = 0; i < netPlayers.Length; i++)
+        {
+            players.Add(new Player(new SymbolAndSprite(netPlayers[i].playerSymbol, possiblePlayerSymbols.GetSprite(netPlayers[i].playerSymbol)),
+                                               netPlayers[i].color, netPlayers[i].playerName));
+        }
+        numberOfPlayers = netPlayers.Length;
     }
 
 

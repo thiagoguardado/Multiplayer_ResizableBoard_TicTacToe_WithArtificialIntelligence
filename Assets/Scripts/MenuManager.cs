@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 
@@ -26,7 +27,12 @@ public class MenuManager : MonoBehaviour {
         Instance = this;
         menuView = GetComponent<MenuView>();
 
-        GameManager.Instance.Initialize();
+        if (!NetworkServer.active)
+        {
+            GameManager.Instance.Initialize();
+        } else {
+            GameManager.Instance.NetworkInitialize();
+        }
 
     }
 
@@ -44,7 +50,6 @@ public class MenuManager : MonoBehaviour {
             boardSizeAnimator.SetTrigger("change");
             menuView.UpdateView();
             AudioManager.Instance.PlayOptionSelectSFX();
-
         }
     }
 

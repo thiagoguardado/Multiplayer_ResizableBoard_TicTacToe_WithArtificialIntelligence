@@ -19,7 +19,7 @@ public class NetworkMenu : MonoBehaviour {
 
     private float refreshListTimer = 0f;
     private MyNetworkManager myNetwork;
-    private List<MatchData> _matchesToDisplay = new List<MatchData>();
+    private List<NetworkMatchData> _matchesToDisplay = new List<NetworkMatchData>();
     private List<NetworkGameSelectionMatch> _currentMatchesDisplayed = new List<NetworkGameSelectionMatch>();
 
     private void Awake()
@@ -59,11 +59,11 @@ public class NetworkMenu : MonoBehaviour {
         {
             string matchData = Encoding.Unicode.GetString(result.broadcastData);
 
-            MatchData match;
+            NetworkMatchData match;
             
             try
             {
-                match = new MatchData(result, possibleSymbols,"");
+                match = new NetworkMatchData(result, possibleSymbols,"");
             }
             catch (System.Exception e)
             {
@@ -150,7 +150,7 @@ public class NetworkMenu : MonoBehaviour {
         }
     }
 
-    private NetworkGameSelectionMatch AddMatchToList(MatchData matchData)
+    private NetworkGameSelectionMatch AddMatchToList(NetworkMatchData matchData)
     {
         NetworkGameSelectionMatch m = Instantiate(matchPanelPrefab, matchListPanelParent);
         m.Setup(matchData);
@@ -178,23 +178,23 @@ public class NetworkMenu : MonoBehaviour {
 }
 
 [System.Serializable]
-public class MatchData
+public class NetworkMatchData
 {
 
     public string matchName;
-    [SerializeField] public MatchPlayer[] playersOnLobby;
+    [SerializeField] public NetworkPlayer[] playersOnLobby;
     public string serverAddress;
 
-    public MatchData() { }
+    public NetworkMatchData() { }
 
 
-    public MatchData(string matchName, string serverAddress)
+    public NetworkMatchData(string matchName, string serverAddress)
     {
         this.matchName = matchName;
         this.serverAddress = NetworkManager.singleton.networkAddress;
     }
 
-    public MatchData(NetworkBroadcastResult broadcastResult, PlayerSymbols playerSymbols, string playerName) 
+    public NetworkMatchData(NetworkBroadcastResult broadcastResult, PlayerSymbols playerSymbols, string playerName) 
     {
         string[] splitted = Encoding.Unicode.GetString(broadcastResult.broadcastData).Split('_');
         matchName = splitted[0];
@@ -229,7 +229,7 @@ public class MatchData
             {
                 throw new System.Exception("broadcast sprite data error");
             }
-            playersOnLobby = new MatchPlayer[] { new MatchPlayer(symbol, color, name, -1) };
+            playersOnLobby = new NetworkPlayer[] { new NetworkPlayer(symbol, color, name, -1) };
         }
 
         serverAddress = broadcastResult.serverAddress;
@@ -253,7 +253,7 @@ public class MatchData
 
     }
 
-    public static string CreateMatchBroadcastData(MatchData matchData)
+    public static string CreateMatchBroadcastData(NetworkMatchData matchData)
     {
 
         string playersData = "";
@@ -269,23 +269,23 @@ public class MatchData
 
     }
 
-    public void AddPlayer(MatchPlayer player)
+    public void AddPlayer(NetworkPlayer player)
     {
         if (playersOnLobby != null)
         {
-            List<MatchPlayer> m = playersOnLobby.ToList<MatchPlayer>();
+            List<NetworkPlayer> m = playersOnLobby.ToList<NetworkPlayer>();
             m.Add(player);
             playersOnLobby = m.ToArray();
         }
         else {
-            playersOnLobby = new MatchPlayer[] { player };
+            playersOnLobby = new NetworkPlayer[] { player };
         }
     }
 
 
     public void RemovePlayer(int connectionID)
     {
-        List<MatchPlayer> m = playersOnLobby.ToList<MatchPlayer>();
+        List<NetworkPlayer> m = playersOnLobby.ToList<NetworkPlayer>();
         int i = -1;
         for (i = 0; i < m.Count; i++)
         {
@@ -305,17 +305,17 @@ public class MatchData
 }
 
 [System.Serializable]
-public class MatchPlayer
+public class NetworkPlayer
 {
     public PlayerSymbol playerSymbol;
     public Color color;
     public string playerName;
     public int connectionID;
 
-    public MatchPlayer() { }
+    public NetworkPlayer() { }
 
 
-    public MatchPlayer(PlayerSymbol playerSymbol, Color color, string playerName, int connectionID)
+    public NetworkPlayer(PlayerSymbol playerSymbol, Color color, string playerName, int connectionID)
     {
         this.playerSymbol = playerSymbol;
         this.color = color;
@@ -323,13 +323,13 @@ public class MatchPlayer
         this.connectionID = connectionID;
     }
 
-    public MatchPlayer(string playerName, int connectionID)
+    public NetworkPlayer(string playerName, int connectionID)
     {
         this.playerName = playerName;
         this.connectionID = connectionID;
     }
 
-    public MatchPlayer(int connectionID, bool random)
+    public NetworkPlayer(int connectionID, bool random)
     {
         if(!random) 
         {

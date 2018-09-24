@@ -77,7 +77,7 @@ public class NetworkGameLobby : NetworkBehaviour {
     }
 
     [Command]
-    private void CmdUpdatePlayerName(MatchPlayer player)
+    private void CmdUpdatePlayerName(NetworkPlayer player)
     {
         for (int i = 0; i < mynetworkManager.currentMatch.playersOnLobby.Length; i++)
         {
@@ -91,7 +91,7 @@ public class NetworkGameLobby : NetworkBehaviour {
 
 
     [ClientRpc]
-    private void RpcSendMatchDataToClients(MatchData currentMatchData)
+    private void RpcSendMatchDataToClients(NetworkMatchData currentMatchData)
     {
         if(!NetworkServer.active)
             mynetworkManager.currentMatch = currentMatchData;
@@ -112,5 +112,7 @@ public class NetworkGameLobby : NetworkBehaviour {
     {
         RpcSendMatchDataToClients(mynetworkManager.currentMatch);
     }
-    
+
+
+
 }

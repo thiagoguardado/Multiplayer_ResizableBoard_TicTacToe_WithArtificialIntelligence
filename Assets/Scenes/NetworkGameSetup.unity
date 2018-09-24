@@ -462,7 +462,7 @@ Prefab:
     - target: {fileID: 224758795778902900, guid: a61bbc4cae1f9be45a89fe4c5c97919c,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -143.8858
       objectReference: {fileID: 0}
     - target: {fileID: 224758795778902900, guid: a61bbc4cae1f9be45a89fe4c5c97919c,
         type: 2}
@@ -472,7 +472,7 @@ Prefab:
     - target: {fileID: 224758795778902900, guid: a61bbc4cae1f9be45a89fe4c5c97919c,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 187.77159
       objectReference: {fileID: 0}
     - target: {fileID: 224847125971285642, guid: a61bbc4cae1f9be45a89fe4c5c97919c,
         type: 2}
@@ -492,7 +492,7 @@ Prefab:
     - target: {fileID: 224847125971285642, guid: a61bbc4cae1f9be45a89fe4c5c97919c,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -676.06146
       objectReference: {fileID: 0}
     - target: {fileID: 224847125971285642, guid: a61bbc4cae1f9be45a89fe4c5c97919c,
         type: 2}
@@ -502,7 +502,7 @@ Prefab:
     - target: {fileID: 224847125971285642, guid: a61bbc4cae1f9be45a89fe4c5c97919c,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 876.5797
       objectReference: {fileID: 0}
     - target: {fileID: 224986593207246080, guid: a61bbc4cae1f9be45a89fe4c5c97919c,
         type: 2}
@@ -522,7 +522,7 @@ Prefab:
     - target: {fileID: 224986593207246080, guid: a61bbc4cae1f9be45a89fe4c5c97919c,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -1168.1371
       objectReference: {fileID: 0}
     - target: {fileID: 224986593207246080, guid: a61bbc4cae1f9be45a89fe4c5c97919c,
         type: 2}
@@ -532,7 +532,7 @@ Prefab:
     - target: {fileID: 224986593207246080, guid: a61bbc4cae1f9be45a89fe4c5c97919c,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 107.57154
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a61bbc4cae1f9be45a89fe4c5c97919c, type: 2}

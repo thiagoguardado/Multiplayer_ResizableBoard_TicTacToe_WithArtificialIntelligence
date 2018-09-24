@@ -21,10 +21,10 @@ public class MyNetworkManager : NetworkManager {
 
 
     public PlayerSymbols possibleSymbols;
-    public MatchData currentMatch;
+    public NetworkMatchData currentMatch;
     public List<int> currentConnectionsIDs = new List<int>();
     public string playerName = "Player";
-    public MatchPlayer currentPlayer;
+    public NetworkPlayer currentPlayer;
 
     public bool isConnected { get; private set; }
 
@@ -47,7 +47,7 @@ public class MyNetworkManager : NetworkManager {
 
     public void StartBroadcastingNewMatch(string newMatchName)
     {
-        currentMatch = new MatchData(newMatchName, singleton.networkAddress);
+        currentMatch = new NetworkMatchData(newMatchName, singleton.networkAddress);
         singleton.StartHost();
         isConnected = true;
 
@@ -55,7 +55,7 @@ public class MyNetworkManager : NetworkManager {
 
     }
 
-    public void ConnectToAMatch(MatchData matchData)
+    public void ConnectToAMatch(NetworkMatchData matchData)
     {
         singleton.networkAddress = matchData.serverAddress;
         singleton.StartClient();
@@ -69,8 +69,10 @@ public class MyNetworkManager : NetworkManager {
         base.OnServerConnect(conn);
 
         currentConnectionsIDs.Add(conn.connectionId);
-        currentMatch.AddPlayer(new MatchPlayer(conn.connectionId, true));
+        currentMatch.AddPlayer(new NetworkPlayer(conn.connectionId, true));
         StartCoroutine(RefreshBroadcastInfo());
+        GameManager.Instance.SetNetworkPlayers(currentMatch.playersOnLobby);
+
 
         NetworkGameLobbyView netView = GetComponent<NetworkGameLobbyView>();
         if (netView != null)
@@ -95,7 +97,7 @@ public class MyNetworkManager : NetworkManager {
             Discovery.StopBroadcast();
         }
 
-        currentPlayer = new MatchPlayer(playerName,conn.connectionId);
+        currentPlayer = new NetworkPlayer(playerName,conn.connectionId);
     }
 
 
@@ -123,12 +125,17 @@ public class MyNetworkManager : NetworkManager {
             StartCoroutine(RefreshBroadcastInfo());
         }
 
+        foreach (var netID in FindObjectsOfType<NetworkIdentity>())
+        {
+            if (netID.netId.Value == conn.connectionId) Destroy(netID.gameObject);
+        }
+
     }
 
     private IEnumerator RefreshBroadcastInfo()
     {
         Discovery.StopBroadcast();
-        Discovery.broadcastData = MatchData.CreateMatchBroadcastData(currentMatch);
+        Discovery.broadcastData = NetworkMatchData.CreateMatchBroadcastData(currentMatch);
         yield return null;
         Discovery.StartAsServer();
     }
@@ -149,4 +156,6 @@ public class MyNetworkManager : NetworkManager {
         Discovery.StopBroadcast();
         Network.Disconnect();
     }
+
+
 }

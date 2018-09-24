@@ -6,13 +6,13 @@ using UnityEngine.UI;
 
 public class NetworkGameSelectionMatch : MonoBehaviour {
 
-    public MatchData thisMatchData;
+    public NetworkMatchData thisMatchData;
     public Text matchName;
     public int maxCharsInName = 15;
     public List<Image> playerSymbols = new List<Image>();
     public PlayerSymbols possibleSymbols;
 
-    public void Setup(MatchData _matchData)
+    public void Setup(NetworkMatchData _matchData)
     {
         thisMatchData = _matchData;
 
@@ -23,11 +23,10 @@ public class NetworkGameSelectionMatch : MonoBehaviour {
 
     private void SetName(string newName)
     {
-        Debug.Log(newName);
         matchName.text = newName.Substring(0, Mathf.Min(newName.Length,maxCharsInName));
     }
 
-    private void SetPlayers(List<MatchPlayer> players)
+    private void SetPlayers(List<NetworkPlayer> players)
     {
         foreach (Image image in playerSymbols)
         {

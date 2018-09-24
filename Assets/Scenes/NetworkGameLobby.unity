@@ -1966,7 +1966,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a005c99208c556c4cb15fdc15f1738f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerBoxPrefab: {fileID: 114147151314450218, guid: 7221eaa9b06e5fc43b9d917b78c796b1,
+  playerBoxPrefab: {fileID: 114051380616340088, guid: 5bff97e39f4194efab48c9808648f5da,
     type: 2}
   boardSize: {fileID: 2096570716}
   boardSizeGreaterSign: {fileID: 1006927187}

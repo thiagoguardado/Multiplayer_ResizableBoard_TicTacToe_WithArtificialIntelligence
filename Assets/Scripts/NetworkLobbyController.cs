@@ -8,12 +8,23 @@ public class NetworkLobbyController : MonoBehaviour {
 
     public void StartGame()
     {
-        /*
-        GameManager.Instance.StartGame();
-        AudioManager.Instance.PlayStartGameSFX();
-        */
+        Debug.Log("Pressed Start Game");
+        MyNetworkManager.Discovery.MyStopBroadcast();
 
-        Debug.Log("StartGame");
+        // update networked itens
+        NetworkGameLobby[] clientsScript = FindObjectsOfType<NetworkGameLobby>();
+        foreach (var script in clientsScript)
+        {
+            
+            if (script.isLocalPlayer)
+            {
+                script.RpcStartGame();
+                Debug.Log("Sent RPC");
+                break;
+            }
+            
+        }
+        
     }
 
     public void Return()

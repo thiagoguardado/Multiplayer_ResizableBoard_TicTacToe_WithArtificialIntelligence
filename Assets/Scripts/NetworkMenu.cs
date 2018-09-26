@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NetworkMenu : MonoBehaviour {
@@ -104,10 +105,15 @@ public class NetworkMenu : MonoBehaviour {
         {
             RemoveMatchFromList(item);
         }
-       
 
     }
 
+    public void BackButton()
+    {
+        // cancel network
+        MyNetworkManager.Discovery.MyStopBroadcast();
+        SceneManager.LoadScene("TitleScreen");
+    }
 
     public void CreateNewMatch()
     {

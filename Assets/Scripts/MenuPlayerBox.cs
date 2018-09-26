@@ -54,23 +54,26 @@ public class MenuPlayerBox : MonoBehaviour {
 
 
 
-    public void ChangeColor()
+    public void ChangeColor(bool animateChange)
     {
         GameManager.players[index].color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
-        menuView.UpdateView();
-        imageAnimator.SetTrigger("change");
-        AudioManager.Instance.PlayOptionSelectSFX();
+
+        if (animateChange) EffectivateChange();
 
     }
 
-    public void ChangeType()
+    public void ChangeType(bool animateChange)
     {
         GameManager.players[index].playerType = (PlayerType)(((int)GameManager.players[index].playerType + 1) % Enum.GetValues(typeof(PlayerType)).Length);
 
+        if (animateChange) EffectivateChange();
+
+    }
+
+    public void EffectivateChange()
+    {
         menuView.UpdateView();
-
         textAnimator.SetTrigger("change");
-
         AudioManager.Instance.PlayOptionSelectSFX();
     }
 

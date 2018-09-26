@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class NetworkGameLobby : NetworkBehaviour {
 
@@ -113,6 +114,18 @@ public class NetworkGameLobby : NetworkBehaviour {
         RpcSendMatchDataToClients(mynetworkManager.currentMatch);
     }
 
+    [ClientRpc]
+    public void RpcChangeBoardSize(int newBoardSize)
+    {
+        MenuManager.Instance.EffectivateBoardSizeChange();
+        GameManager.boardSize = newBoardSize;
+    }
 
-
+    [ClientRpc]
+    public void RpcStartGame()
+    {
+        GameManager.Instance.StartGame();
+        AudioManager.Instance.PlayStartGameSFX();
+    }
 }
+

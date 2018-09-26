@@ -18,11 +18,14 @@ public class NetworkGameLobbyView : MenuView
     public Button lessSignButton;
     public Button greaterSignButton;
 
-    public bool onlyClient = false;
+    private bool onlyClient = false;
     public MyNetworkManager myNetworkManager { get; private set; }
 
     void Start()
     {
+
+        myNetworkManager = NetworkManager.singleton.GetComponent<MyNetworkManager>();
+
         // se cliente
         if (NetworkClient.active && !NetworkServer.active)
         {
@@ -34,9 +37,12 @@ public class NetworkGameLobbyView : MenuView
             playButton.interactable = false;
             lessSignButton.gameObject.SetActive(false);
             greaterSignButton.gameObject.SetActive(false);
+        } else
+        {
+            playButton.interactable = !(myNetworkManager.currentMatch.playersOnLobby.Length < 2);
         }
 
-        myNetworkManager = NetworkManager.singleton.GetComponent<MyNetworkManager>();
+        
 
     }
 
@@ -56,9 +62,15 @@ public class NetworkGameLobbyView : MenuView
 
     public override void UpdateView()
     {
-
         UpdateBoardSize();
         UpdateMenuPlayerBoxes();
+        UpdatePlayButton();
+    }
+
+    private void UpdatePlayButton()
+    {
+        if(!onlyClient)
+            playButton.interactable = !(myNetworkManager.currentMatch.playersOnLobby.Length < 2);
     }
 
     private void UpdateBoardSize()
@@ -106,7 +118,7 @@ public class NetworkGameLobbyView : MenuView
             for (int i = 0; i < lobby.mynetworkManager.currentMatch.playersOnLobby.Length; i++)
             {
                 NetworkPlayer p = lobby.mynetworkManager.currentMatch.playersOnLobby[i];
-                ((NetworkLobbyPlayerBox)menuPlayerBoxes[i]).Setup(possibleSymbols.GetSprite(p.playerSymbol), p.color, p.playerName, p.connectionID, this);
+                ((NetworkLobbyPlayerBox)menuPlayerBoxes[i]).SetupChange(possibleSymbols.GetSprite(p.playerSymbol), p.color, p.playerName, p.connectionID, this);
 
             }
         }
@@ -139,13 +151,12 @@ public class NetworkGameLobbyView : MenuView
             lobby.mynetworkManager.StopClient();
 
             SceneManager.LoadScene("TitleScreen");
-
         }
         else
         {
-
             lobby.mynetworkManager.StopHost();
-            MyNetworkManager.Discovery.StopBroadcast();
+            MyNetworkManager.Discovery.MyStopBroadcast();
+            MyNetworkDiscovery.isBroadcasting = false;
             SceneManager.LoadScene("TitleScreen");
         }
 

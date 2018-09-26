@@ -42,14 +42,27 @@ public class MenuManager : MonoBehaviour {
         //menuView.UpdateView();
     }
 
+    public void EffectivateBoardSizeChange()
+    {
+        boardSizeAnimator.SetTrigger("change");
+        menuView.UpdateView();
+        AudioManager.Instance.PlayOptionSelectSFX();
+    }
 
     public void ChangeBoardSize(bool greater)
     {
         if (GameManager.ChangeBoardSize(PossibleBoardSize, greater))
         {
-            boardSizeAnimator.SetTrigger("change");
-            menuView.UpdateView();
-            AudioManager.Instance.PlayOptionSelectSFX();
+            // do changes
+            EffectivateBoardSizeChange();
+
+            // update networked itens
+            NetworkGameLobby[] clientsScript = FindObjectsOfType<NetworkGameLobby>();
+            foreach (var script in clientsScript)
+            {
+                if(script.isLocalPlayer) script.RpcChangeBoardSize(GameManager.boardSize);
+                break;
+            }
         }
     }
 
@@ -60,6 +73,7 @@ public class MenuManager : MonoBehaviour {
             numberOfPlayersAnimator.SetTrigger("change");
             menuView.UpdateView();
             AudioManager.Instance.PlayOptionSelectSFX();
+
         }
     }
 

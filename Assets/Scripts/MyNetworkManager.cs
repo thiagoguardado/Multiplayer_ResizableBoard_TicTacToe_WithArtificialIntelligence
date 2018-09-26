@@ -19,6 +19,7 @@ public class MyNetworkManager : NetworkManager {
 
     public static NetworkType NetworkType { get; set; }
 
+    public static bool isBroadcasting = false;
 
     public PlayerSymbols possibleSymbols;
     public NetworkMatchData currentMatch;
@@ -34,15 +35,14 @@ public class MyNetworkManager : NetworkManager {
         isConnected = false;
     }
 
-    private void Update()
-    {
+    //private void Update()
+    //{
 
-    }
+    //}
 
     public void StartLookingForMatches()
     {
-        Discovery.Initialize();
-        Discovery.StartAsClient();
+        Discovery.InitializeAsClient();
     }
 
     public void StartBroadcastingNewMatch(string newMatchName)
@@ -60,7 +60,6 @@ public class MyNetworkManager : NetworkManager {
         singleton.networkAddress = matchData.serverAddress;
         singleton.StartClient();
         isConnected = true;
-
         UnityEngine.SceneManagement.SceneManager.LoadScene("NetworkGameLobby");
     }
 
@@ -83,7 +82,7 @@ public class MyNetworkManager : NetworkManager {
         if (currentMatch.playersOnLobby.Length >= 4)
         {
             //Stop broadcast
-            Discovery.StopBroadcast();
+            Discovery.MyStopBroadcast();
         }
 
     }
@@ -94,7 +93,7 @@ public class MyNetworkManager : NetworkManager {
 
         if (!NetworkServer.active)
         {
-            Discovery.StopBroadcast();
+            Discovery.MyStopBroadcast();
         }
 
         currentPlayer = new NetworkPlayer(playerName,conn.connectionId);
@@ -103,21 +102,27 @@ public class MyNetworkManager : NetworkManager {
 
     public override void OnClientDisconnect(NetworkConnection conn)
     {
+
+        base.OnClientDisconnect(conn);
+
         Debug.Log("Server disconnected");
 
         currentPlayer = null;
 
         ClientDisconnectAll();
 
-        GameManager.Instance.ReturnToMenu();
+        GameManager.Instance.ReturnToTitleScreen();
 
     }
 
 
     public override void OnServerDisconnect(NetworkConnection conn)
     {
+
         currentConnectionsIDs.Remove(conn.connectionId);
         currentMatch.RemovePlayer(conn.connectionId);
+
+        base.OnServerDisconnect(conn);
 
         if (currentMatch.playersOnLobby.Length <4)
         {
@@ -125,19 +130,19 @@ public class MyNetworkManager : NetworkManager {
             StartCoroutine(RefreshBroadcastInfo());
         }
 
-        foreach (var netID in FindObjectsOfType<NetworkIdentity>())
-        {
-            if (netID.netId.Value == conn.connectionId) Destroy(netID.gameObject);
-        }
+        //foreach (var netID in FindObjectsOfType<NetworkIdentity>())
+        //{
+        //    if (netID.netId.Value == conn.connectionId) Destroy(netID.gameObject);
+        //}
 
     }
 
     private IEnumerator RefreshBroadcastInfo()
     {
-        Discovery.StopBroadcast();
+        Discovery.MyStopBroadcast();
         Discovery.broadcastData = NetworkMatchData.CreateMatchBroadcastData(currentMatch);
         yield return null;
-        Discovery.StartAsServer();
+        Discovery.RestartAsServer();
     }
 
     public static void ClientDisconnectAll()
@@ -153,7 +158,7 @@ public class MyNetworkManager : NetworkManager {
         singleton.StopClient();
         singleton.StopHost();
         singleton.StopMatchMaker();
-        Discovery.StopBroadcast();
+        Discovery.MyStopBroadcast();
         Network.Disconnect();
     }
 

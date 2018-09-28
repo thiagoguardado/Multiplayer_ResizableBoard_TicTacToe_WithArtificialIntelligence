@@ -188,7 +188,7 @@ public class NetworkMatchData
 {
 
     public string matchName;
-    [SerializeField] public NetworkPlayer[] playersOnLobby;
+    [SerializeField] public NetworkPlayer[] playersOnLobby = new NetworkPlayer[0];
     public string serverAddress;
 
     public NetworkMatchData() { }
@@ -347,6 +347,14 @@ public class NetworkPlayer
             this.playerSymbol = (PlayerSymbol)UnityEngine.Random.Range(0, Enum.GetValues(typeof(PlayerSymbol)).Length);
             this.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, 1);
         }
+        this.playerName = "";
+        this.connectionID = connectionID;
+    }
+
+    public NetworkPlayer(PlayerSymbol playerSymbol, int connectionID)
+    {
+        this.playerSymbol = playerSymbol;
+        this.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, 1);
         this.playerName = "";
         this.connectionID = connectionID;
     }

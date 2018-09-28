@@ -45,6 +45,9 @@ public class BoardManager : MonoBehaviour {
 
     [Header("Board and Players")]
     public int boardSize = 3;   // current game boad size
+
+
+
     public List<GamePlayer> players = new List<GamePlayer>(); // list of current players
     private Board m_board; // current game board object
     public Board Board
@@ -68,6 +71,10 @@ public class BoardManager : MonoBehaviour {
         }
     }
 
+    public delegate void BoardChange(int position);
+    public delegate void BoardAction();
+    public static event BoardChange AddedPlayerToBoard;
+    public static event BoardAction BoardInitialized;
 
     private void Awake() {
 
@@ -97,6 +104,8 @@ public class BoardManager : MonoBehaviour {
                 ia.Initialize(this, players[i], minimaxType,maxMinimaxDepth);
             }
         }
+
+        if (BoardInitialized != null) BoardInitialized.Invoke();
 
     }
 
@@ -195,6 +204,8 @@ public class BoardManager : MonoBehaviour {
                 // check end of game
                 CheckAndResolveEndGame();
 
+                // trigger event
+                if (AddedPlayerToBoard != null) AddedPlayerToBoard.Invoke(position);
             }
 
 
@@ -351,9 +362,9 @@ public struct Board
     {
         m_size = referenceBoard.Size;
         m_fullBoard = new List<GamePlayer>();
-        for (int i = 0; i < (referenceBoard.m_fullBoard.Count); i++)
+        for (int i = 0; i < (referenceBoard.FullBoard.Count); i++)
         {
-            m_fullBoard.Add(referenceBoard.m_fullBoard[i]);
+            m_fullBoard.Add(referenceBoard.FullBoard[i]);
         }
         players = referenceBoard.players;
         currentPlayer = referenceBoard.currentPlayer;
@@ -975,6 +986,7 @@ public struct Board
 
         return null;
     }
+
 
 }
 

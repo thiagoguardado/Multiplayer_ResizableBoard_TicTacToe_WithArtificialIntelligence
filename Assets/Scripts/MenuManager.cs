@@ -88,21 +88,23 @@ public class Player
     public Color color;
     public PlayerType playerType;
     public string playerName;
+    public int networkConnectionID;
 
     public Player(SymbolAndSprite _playerSymbolAndSprite, string playerName = "")
     {
-        playerSymbolAndSprite = _playerSymbolAndSprite;
-        color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
-        playerType = PlayerType.Human;
+        this.playerSymbolAndSprite = _playerSymbolAndSprite;
+        this.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+        this.playerType = PlayerType.Human;
         this.playerName = playerName;
     }
 
-    public Player(SymbolAndSprite _playerSymbolAndSprite, Color color, string playerName = "")
+    public Player(SymbolAndSprite _playerSymbolAndSprite, Color color, string playerName = "", int connectionID = 0)
     {
-        playerSymbolAndSprite = _playerSymbolAndSprite;
+        this.playerSymbolAndSprite = _playerSymbolAndSprite;
         this.color = color;
-        playerType = PlayerType.Human;
         this.playerName = playerName;
+        this.networkConnectionID = connectionID;
+        this.playerType = PlayerType.Human;
     }
 
 }

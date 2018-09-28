@@ -69,6 +69,11 @@ public class NetworkGameLobby : NetworkBehaviour {
             CmdUpdateMatchData();
     }
 
+    public void StartGameOnClients()
+    {
+        RpcStartGame(mynetworkManager.currentMatch, GameManager.boardSize);
+    }
+
 
     [ClientRpc]
     private void RpcAskPlayerForName()
@@ -122,8 +127,12 @@ public class NetworkGameLobby : NetworkBehaviour {
     }
 
     [ClientRpc]
-    public void RpcStartGame()
+    private void RpcStartGame(NetworkMatchData matchData, int boardsize)
     {
+        Debug.Log("Received RPC start game!");
+        mynetworkManager.currentMatch = matchData;
+        GameManager.boardSize = boardsize;
+        GameManager.Instance.SetNetworkPlayers(matchData.playersOnLobby);
         GameManager.Instance.StartGame();
         AudioManager.Instance.PlayStartGameSFX();
     }

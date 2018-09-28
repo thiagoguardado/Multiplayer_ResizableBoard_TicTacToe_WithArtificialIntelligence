@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 public class NetworkLobbyPlayerBox : MenuPlayerBox
 {
@@ -66,26 +67,22 @@ public class NetworkLobbyPlayerBox : MenuPlayerBox
         if (NetworkServer.active)
         {
             NetworkPlayer[] netPlayers = ((NetworkGameLobbyView)menuView).myNetworkManager.currentMatch.playersOnLobby;
+            PlayerSymbol newSymbol = ((NetworkGameLobbyView)menuView).myNetworkManager.ChooseRandomNewPlayerSymbol();
 
             for (int i = 0; i < netPlayers.Length; i++)
             {
                 if (netPlayers[i].connectionID == connectionID)
                 {
-                    PlayerSymbol currentSymbol = netPlayers[i].playerSymbol;
-                    PlayerSymbol newSymbol = currentSymbol;
-                    while (newSymbol == currentSymbol)
-                        newSymbol = (PlayerSymbol)UnityEngine.Random.Range(0, Enum.GetValues(typeof(PlayerSymbol)).Length);
-
                     ((NetworkGameLobbyView)menuView).myNetworkManager.currentMatch.playersOnLobby[i].playerSymbol = newSymbol;
                     image.sprite = ((NetworkGameLobbyView)menuView).myNetworkManager.possibleSymbols.GetSprite(newSymbol);
                     if (animateChange) EffectivateChange();
                     break;
                 }
             }
-
         }
-
     }
+
+
 
     new public void EffectivateChange()
     {

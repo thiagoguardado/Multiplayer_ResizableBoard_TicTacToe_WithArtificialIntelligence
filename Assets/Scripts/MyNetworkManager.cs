@@ -68,10 +68,8 @@ public class MyNetworkManager : NetworkManager {
         base.OnServerConnect(conn);
 
         currentConnectionsIDs.Add(conn.connectionId);
-        currentMatch.AddPlayer(new NetworkPlayer(conn.connectionId, true));
+        currentMatch.AddPlayer(new NetworkPlayer(ChooseRandomNewPlayerSymbol(), conn.connectionId));
         StartCoroutine(RefreshBroadcastInfo());
-        GameManager.Instance.SetNetworkPlayers(currentMatch.playersOnLobby);
-
 
         NetworkGameLobbyView netView = GetComponent<NetworkGameLobbyView>();
         if (netView != null)
@@ -162,5 +160,14 @@ public class MyNetworkManager : NetworkManager {
         Network.Disconnect();
     }
 
+    public PlayerSymbol ChooseRandomNewPlayerSymbol()
+    {
+        PlayerSymbol[] currentSymbols = new PlayerSymbol[currentMatch.playersOnLobby.Length];
+        for (int i = 0; i < currentMatch.playersOnLobby.Length; i++)
+        {
+            currentSymbols[i] = currentMatch.playersOnLobby[i].playerSymbol;
+        }
 
+        return GameManager.FindDifferentPlayerSymbol(currentSymbols);
+    }
 }

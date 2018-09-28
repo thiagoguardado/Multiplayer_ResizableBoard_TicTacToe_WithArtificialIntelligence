@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -33,6 +34,10 @@ public class GameManager : MonoBehaviour {
 
     public PlayerSymbols possiblePlayerSymbols;
 
+    public delegate void GameAction();
+    public static event GameAction GameStarted;
+    public static event GameAction GameEnded;
+
     private void Awake()
     {
         // singleton
@@ -56,6 +61,7 @@ public class GameManager : MonoBehaviour {
         SceneManager.LoadScene("GameScene");
         AudioManager.Instance.ChangeToInGameMusic();
         gameState = GameState.GameStarted;
+        if (GameStarted != null) GameStarted.Invoke();
 
     }
 
@@ -180,14 +186,24 @@ public class GameManager : MonoBehaviour {
     }
 
     public void SetNetworkPlayers(NetworkPlayer[] netPlayers){
+
         players.Clear();
         for (int i = 0; i < netPlayers.Length; i++)
         {
             players.Add(new Player(new SymbolAndSprite(netPlayers[i].playerSymbol, possiblePlayerSymbols.GetSprite(netPlayers[i].playerSymbol)),
-                                               netPlayers[i].color, netPlayers[i].playerName));
+                                               netPlayers[i].color, netPlayers[i].playerName,netPlayers[i].connectionID));
         }
         numberOfPlayers = netPlayers.Length;
     }
 
+
+    public static PlayerSymbol FindDifferentPlayerSymbol(PlayerSymbol[] currentSymbols)
+    {
+        PlayerSymbol[] possibleSymbols = (PlayerSymbol[])Enum.GetValues(typeof(PlayerSymbol));
+        PlayerSymbol[] eligibleSymbols = possibleSymbols.Except(currentSymbols).ToArray<PlayerSymbol>();
+
+        return eligibleSymbols[UnityEngine.Random.Range(0, eligibleSymbols.Length)];
+
+    }
 
 }

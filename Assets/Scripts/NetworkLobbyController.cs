@@ -8,7 +8,6 @@ public class NetworkLobbyController : MonoBehaviour {
 
     public void StartGame()
     {
-        Debug.Log("Pressed Start Game");
         MyNetworkManager.Discovery.MyStopBroadcast();
 
         // update networked itens
@@ -18,14 +17,15 @@ public class NetworkLobbyController : MonoBehaviour {
             
             if (script.isLocalPlayer)
             {
-                script.RpcStartGame();
-                Debug.Log("Sent RPC");
+                script.StartGameOnClients();
                 break;
             }
             
         }
         
     }
+
+    
 
     public void Return()
     {
@@ -39,6 +39,7 @@ public class NetworkLobbyController : MonoBehaviour {
         }
 
         GameManager.Instance.ReturnToTitleScreen();
+
     }
 
 

@@ -55,7 +55,7 @@ public class UIView : MonoBehaviour {
             userActionAnimator.SetBool("off", false);
         }
 
-        if (BoardManager.Instance.Board.CurrentPlayer.playerType == PlayerType.Human)
+        if (BoardManager.Instance.Board.CurrentPlayer.playerType == PlayerType.Human && GameManager.playerCanInteract)
         {
             userActionAnimator.SetBool("waiting", false);
         }

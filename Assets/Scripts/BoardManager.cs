@@ -449,6 +449,13 @@ public struct Board
     /// <returns></returns>
     public bool AddPlayerToBoard(int position,GamePlayer player)
     {
+
+        if (position == -1)
+        {
+            currentPlayer = NextPlayer();
+            return true;
+        }
+
         GamePlayer gp = PlayerAtBoardPosition(position);
         if (gp == null)
         {
@@ -462,6 +469,7 @@ public struct Board
 
         return false;
     }
+
 
     /// <summary>
     /// Removes any player from position

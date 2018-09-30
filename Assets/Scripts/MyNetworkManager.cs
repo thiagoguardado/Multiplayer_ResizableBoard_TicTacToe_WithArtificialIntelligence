@@ -23,9 +23,10 @@ public class MyNetworkManager : NetworkManager {
 
     public PlayerSymbols possibleSymbols;
     public NetworkMatchData currentMatch;
-    public List<int> currentConnectionsIDs = new List<int>();
+    public Dictionary<NetworkConnection,int> currentConnections = new Dictionary<NetworkConnection,int>();
     public string playerName = "Player";
     public NetworkPlayer currentPlayer;
+    private int nextPlayerID = 0;
 
     public bool isConnected { get; private set; }
 
@@ -57,33 +58,13 @@ public class MyNetworkManager : NetworkManager {
 
     public void ConnectToAMatch(NetworkMatchData matchData)
     {
+
         singleton.networkAddress = matchData.serverAddress;
         singleton.StartClient();
         isConnected = true;
         UnityEngine.SceneManagement.SceneManager.LoadScene("NetworkGameLobby");
     }
 
-    public override void OnServerConnect(NetworkConnection conn)
-    {
-        base.OnServerConnect(conn);
-
-        currentConnectionsIDs.Add(conn.connectionId);
-        currentMatch.AddPlayer(new NetworkPlayer(ChooseRandomNewPlayerSymbol(), conn.connectionId));
-        StartCoroutine(RefreshBroadcastInfo());
-
-        NetworkGameLobbyView netView = GetComponent<NetworkGameLobbyView>();
-        if (netView != null)
-        {
-            netView.UpdateView();
-        }
-
-        if (currentMatch.playersOnLobby.Length >= 4)
-        {
-            //Stop broadcast
-            Discovery.MyStopBroadcast();
-        }
-
-    }
 
     public override void OnClientConnect(NetworkConnection conn)
     {
@@ -94,7 +75,7 @@ public class MyNetworkManager : NetworkManager {
             Discovery.MyStopBroadcast();
         }
 
-        currentPlayer = new NetworkPlayer(playerName,conn.connectionId);
+        currentPlayer = new NetworkPlayer(playerName, -1);
     }
 
 
@@ -113,12 +94,57 @@ public class MyNetworkManager : NetworkManager {
 
     }
 
+    public override void OnServerConnect(NetworkConnection conn)
+    {
+
+        currentMatch.AddPlayer(new NetworkPlayer(ChooseRandomNewPlayerSymbol(), nextPlayerID));
+        currentConnections.Add(conn, nextPlayerID);
+        nextPlayerID++;
+
+        base.OnServerConnect(conn);
+
+        StartCoroutine(RefreshBroadcastInfo());
+
+        NetworkGameLobbyView netView = GetComponent<NetworkGameLobbyView>();
+        if (netView != null)
+        {
+            netView.UpdateView();
+        }
+
+        if (currentMatch.playersOnLobby.Length >= 4)
+        {
+            //Stop broadcast
+            Discovery.MyStopBroadcast();
+        }
+
+    }
+
 
     public override void OnServerDisconnect(NetworkConnection conn)
     {
 
-        currentConnectionsIDs.Remove(conn.connectionId);
-        currentMatch.RemovePlayer(conn.connectionId);
+        // if in game, remove player from current match and change to next player
+        if (GameManager.GameState == GameState.GameStarted)
+        {
+            NetworkPlayer disconnectedPlayer = new NetworkPlayer();
+            for (int i = 0; i < currentMatch.playersOnLobby.Length; i++)
+            {
+                if (currentMatch.playersOnLobby[i].playerID == currentConnections[conn])
+                {
+                    disconnectedPlayer = currentMatch.playersOnLobby[i];
+                    break;
+                }
+            }
+
+            if (BoardManager.Instance.Board.CurrentPlayer.playerSymbol == disconnectedPlayer.playerSymbol)
+            {
+                BoardManager.Instance.AddPlayerToBoard(-1);
+            }
+
+        }
+        
+        currentMatch.RemovePlayer(currentConnections[conn]);
+        currentConnections.Remove(conn);
 
         base.OnServerDisconnect(conn);
 

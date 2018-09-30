@@ -49,7 +49,7 @@ public class NetworkLobbyPlayerBox : MenuPlayerBox
 
             for (int i = 0; i < netPlayers.Length; i++)
             {
-                if (netPlayers[i].connectionID == connectionID)
+                if (netPlayers[i].playerID == connectionID)
                 {
                     ((NetworkGameLobbyView)menuView).myNetworkManager.currentMatch.playersOnLobby[i].color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
                     if(animateChange) EffectivateChange();
@@ -71,7 +71,7 @@ public class NetworkLobbyPlayerBox : MenuPlayerBox
 
             for (int i = 0; i < netPlayers.Length; i++)
             {
-                if (netPlayers[i].connectionID == connectionID)
+                if (netPlayers[i].playerID == connectionID)
                 {
                     ((NetworkGameLobbyView)menuView).myNetworkManager.currentMatch.playersOnLobby[i].playerSymbol = newSymbol;
                     image.sprite = ((NetworkGameLobbyView)menuView).myNetworkManager.possibleSymbols.GetSprite(newSymbol);

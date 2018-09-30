@@ -190,7 +190,6 @@ public class NetworkMatchData
     public string matchName;
     [SerializeField] public NetworkPlayer[] playersOnLobby = new NetworkPlayer[0];
     public string serverAddress;
-
     public NetworkMatchData() { }
 
 
@@ -205,6 +204,7 @@ public class NetworkMatchData
         string[] splitted = Encoding.Unicode.GetString(broadcastResult.broadcastData).Split('_');
         matchName = splitted[0];
         string[] splittedPlayers = splitted[1].Split('|');
+        List<NetworkPlayer> list = new List<NetworkPlayer>();
         for (int i = 0; i < splittedPlayers.Length; i++)
         {
 
@@ -235,13 +235,13 @@ public class NetworkMatchData
             {
                 throw new System.Exception("broadcast sprite data error");
             }
-            playersOnLobby = new NetworkPlayer[] { new NetworkPlayer(symbol, color, name, -1) };
+            list.Add(new NetworkPlayer(symbol, color, name, -1));
         }
-
+        playersOnLobby = list.ToArray();
         serverAddress = broadcastResult.serverAddress;
     }
 
-    public static string CreateMatchBroadcastData(string matchName, Player[] players)
+    public static string CreateMatchBroadcastData(string matchName, Player[] players, int nextPlayerID)
     {
 
         string playersData = "";
@@ -255,7 +255,7 @@ public class NetworkMatchData
 
         }
 
-        return matchName + "_" + playersData;
+        return matchName +  "_" + playersData;
 
     }
 
@@ -279,7 +279,7 @@ public class NetworkMatchData
     {
         if (playersOnLobby != null)
         {
-            List<NetworkPlayer> m = playersOnLobby.ToList<NetworkPlayer>();
+            List<NetworkPlayer> m = playersOnLobby.ToList();
             m.Add(player);
             playersOnLobby = m.ToArray();
         }
@@ -289,13 +289,13 @@ public class NetworkMatchData
     }
 
 
-    public void RemovePlayer(int connectionID)
+    public void RemovePlayer(int playerID)
     {
         List<NetworkPlayer> m = playersOnLobby.ToList<NetworkPlayer>();
         int i = -1;
         for (i = 0; i < m.Count; i++)
         {
-            if (m[i].connectionID == connectionID)
+            if (m[i].playerID == playerID)
                 break;
         }
         if (i == -1)
@@ -316,26 +316,26 @@ public class NetworkPlayer
     public PlayerSymbol playerSymbol;
     public Color color;
     public string playerName;
-    public int connectionID;
+    public int playerID;
 
     public NetworkPlayer() { }
 
 
-    public NetworkPlayer(PlayerSymbol playerSymbol, Color color, string playerName, int connectionID)
+    public NetworkPlayer(PlayerSymbol playerSymbol, Color color, string playerName, int playerID)
     {
         this.playerSymbol = playerSymbol;
         this.color = color;
         this.playerName = playerName;
-        this.connectionID = connectionID;
+        this.playerID = playerID;
     }
 
-    public NetworkPlayer(string playerName, int connectionID)
+    public NetworkPlayer(string playerName, int playerID)
     {
         this.playerName = playerName;
-        this.connectionID = connectionID;
+        this.playerID = playerID;
     }
 
-    public NetworkPlayer(int connectionID, bool random)
+    public NetworkPlayer(int playerID, bool random)
     {
         if(!random) 
         {
@@ -348,14 +348,14 @@ public class NetworkPlayer
             this.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, 1);
         }
         this.playerName = "";
-        this.connectionID = connectionID;
+        this.playerID = playerID;
     }
 
-    public NetworkPlayer(PlayerSymbol playerSymbol, int connectionID)
+    public NetworkPlayer(PlayerSymbol playerSymbol, int playerID)
     {
         this.playerSymbol = playerSymbol;
         this.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, 1);
         this.playerName = "";
-        this.connectionID = connectionID;
+        this.playerID = playerID;
     }
 }

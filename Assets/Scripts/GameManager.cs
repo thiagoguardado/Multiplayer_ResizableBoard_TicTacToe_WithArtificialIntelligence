@@ -191,7 +191,7 @@ public class GameManager : MonoBehaviour {
         for (int i = 0; i < netPlayers.Length; i++)
         {
             players.Add(new Player(new SymbolAndSprite(netPlayers[i].playerSymbol, possiblePlayerSymbols.GetSprite(netPlayers[i].playerSymbol)),
-                                               netPlayers[i].color, netPlayers[i].playerName,netPlayers[i].connectionID));
+                                               netPlayers[i].color, netPlayers[i].playerName,netPlayers[i].playerID));
         }
         numberOfPlayers = netPlayers.Length;
     }

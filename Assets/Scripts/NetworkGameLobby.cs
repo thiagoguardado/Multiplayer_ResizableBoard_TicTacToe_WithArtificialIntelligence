@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -7,7 +8,7 @@ using UnityEngine.SceneManagement;
 public class NetworkGameLobby : NetworkBehaviour {
 
     public MyNetworkManager mynetworkManager { get; private set; }
-    float timer = 1f;
+    float timer = 0.1f;
     float refreshTime = 1f;
 
     private void Awake()
@@ -52,15 +53,22 @@ public class NetworkGameLobby : NetworkBehaviour {
 
     private void ServerUpdate()
     {
+        UpdatePlayersID();
         UpdatePlayersNameOnServer();
 
     }
 
+    private void UpdatePlayersID()
+    {
+        foreach (var pair in mynetworkManager.currentConnections)
+        {
+            TargetUpdatePlayerID(pair.Key, pair.Value);
+        }
+    }
+
     private void UpdatePlayersNameOnServer()
     {
-
         RpcAskPlayerForName();
-
     }
 
     private void UpdatePlayersOnClient()
@@ -75,6 +83,12 @@ public class NetworkGameLobby : NetworkBehaviour {
     }
 
 
+    [TargetRpc]
+    private void TargetUpdatePlayerID(NetworkConnection target, int playerID)
+    {
+        mynetworkManager.currentPlayer.playerID = playerID;
+    }
+
     [ClientRpc]
     private void RpcAskPlayerForName()
     {
@@ -87,7 +101,7 @@ public class NetworkGameLobby : NetworkBehaviour {
     {
         for (int i = 0; i < mynetworkManager.currentMatch.playersOnLobby.Length; i++)
         {
-            if (mynetworkManager.currentMatch.playersOnLobby[i].connectionID == player.connectionID)
+            if (mynetworkManager.currentMatch.playersOnLobby[i].playerID == player.playerID)
             {
                 mynetworkManager.currentMatch.playersOnLobby[i].playerName = player.playerName;
                 break;
@@ -104,7 +118,7 @@ public class NetworkGameLobby : NetworkBehaviour {
 
         for (int i = 0; i < currentMatchData.playersOnLobby.Length; i++)
         {
-            if (currentMatchData.playersOnLobby[i].connectionID == mynetworkManager.currentPlayer.connectionID)
+            if (currentMatchData.playersOnLobby[i].playerID == mynetworkManager.currentPlayer.playerID)
             {
                 mynetworkManager.currentPlayer.playerSymbol = currentMatchData.playersOnLobby[i].playerSymbol;
                 mynetworkManager.currentPlayer.color = currentMatchData.playersOnLobby[i].color;

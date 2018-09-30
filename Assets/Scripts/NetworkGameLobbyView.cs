@@ -118,7 +118,7 @@ public class NetworkGameLobbyView : MenuView
             for (int i = 0; i < lobby.mynetworkManager.currentMatch.playersOnLobby.Length; i++)
             {
                 NetworkPlayer p = lobby.mynetworkManager.currentMatch.playersOnLobby[i];
-                ((NetworkLobbyPlayerBox)menuPlayerBoxes[i]).SetupChange(possibleSymbols.GetSprite(p.playerSymbol), p.color, p.playerName, p.connectionID, this);
+                ((NetworkLobbyPlayerBox)menuPlayerBoxes[i]).SetupChange(possibleSymbols.GetSprite(p.playerSymbol), p.color, p.playerName, p.playerID, this);
 
             }
         }

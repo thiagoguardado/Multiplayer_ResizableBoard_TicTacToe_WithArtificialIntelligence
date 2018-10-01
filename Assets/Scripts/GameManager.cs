@@ -12,6 +12,14 @@ public enum GameState
     GameFinished
 }
 
+public enum NetworkType
+{
+    Local,
+    LAN,
+    Internet
+}
+
+
 public class GameManager : MonoBehaviour {
 
     public static GameManager Instance;                     //  singleton
@@ -25,6 +33,9 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+
+    public static NetworkType networkType = NetworkType.Local;
+
     public static bool playerCanInteract = true;            // determine if player can interact with game
     public static int numberOfPlayers;                      // current number of players
     public static int boardSize;                            // current board size
@@ -36,6 +47,10 @@ public class GameManager : MonoBehaviour {
 
     public delegate void GameAction();
     public static event GameAction GameStarted;
+
+
+
+
     public static event GameAction GameEnded;
 
     private void Awake()
@@ -83,6 +98,18 @@ public class GameManager : MonoBehaviour {
         gameState = GameState.Menu;
     }
 
+
+    /// <summary>
+    /// Return to menu after finished game on lan
+    /// </summary>
+    public void ReturnToLanMenu()
+    {
+        MyNetworkManager.ClientDisconnectAll();
+        SceneManager.LoadScene("NetworkGameSetup");
+        AudioManager.Instance.ChangeToMenuMusic();
+        gameState = GameState.Menu;
+    }
+
     /// <summary>
     /// Returns to title screen
     /// </summary>
@@ -90,6 +117,7 @@ public class GameManager : MonoBehaviour {
     {
         SceneManager.LoadScene("TitleScreen");
         gameState = GameState.Menu;
+        GameManager.networkType = NetworkType.Local;
     }
 
     /// <summary>
@@ -206,4 +234,36 @@ public class GameManager : MonoBehaviour {
 
     }
 
+
+    public void EndGameClickAction()
+    {
+        switch (networkType)
+        {
+            case NetworkType.Local:
+                AudioManager.Instance.PlayReturnSFX();
+                Instance.ReturnToMenu();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void EscapeFromGameScene()
+    {
+        Instance.FinishGame();
+        AudioManager.Instance.PlayReturnSFX();
+
+        switch (networkType)
+        {
+            case NetworkType.Local:
+                Instance.ReturnToMenu();
+                break;
+            case NetworkType.LAN:
+                Instance.ReturnToLanMenu();
+                break;
+            default:
+                break;
+        }
+
+    }
 }

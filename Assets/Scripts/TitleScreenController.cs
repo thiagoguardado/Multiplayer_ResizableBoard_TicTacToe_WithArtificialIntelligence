@@ -18,6 +18,7 @@ public class TitleScreenController : MonoBehaviour {
 
         titleAnimator.SetBool("Snap", true);
         AudioManager.Instance.PlayStartGameSFX();
+        GameManager.networkType = NetworkType.Local;
         StartCoroutine(WaitAndChangeScreen("LocalGameSetup"));
 
 
@@ -28,7 +29,7 @@ public class TitleScreenController : MonoBehaviour {
 
         titleAnimator.SetBool("Snap", true);
         AudioManager.Instance.PlayStartGameSFX();
-        MyNetworkManager.NetworkType = NetworkType.LAN;
+        GameManager.networkType = NetworkType.LAN;
         StartCoroutine(WaitAndChangeScreen("NetworkGameSetup"));
 
     }
@@ -38,7 +39,7 @@ public class TitleScreenController : MonoBehaviour {
 
         titleAnimator.SetBool("Snap", true);
         AudioManager.Instance.PlayStartGameSFX();
-        MyNetworkManager.NetworkType = NetworkType.Internet;
+        GameManager.networkType = NetworkType.Internet;
         StartCoroutine(WaitAndChangeScreen("NetworkGameSetup"));
 
     }

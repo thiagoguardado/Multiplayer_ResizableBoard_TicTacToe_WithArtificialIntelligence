@@ -24,9 +24,7 @@ public class GameUserInputController : MonoBehaviour {
     {
         if (Input.GetButtonDown("Cancel"))
         {
-            GameManager.Instance.FinishGame();
-            AudioManager.Instance.PlayReturnSFX();
-            GameManager.Instance.ReturnToMenu();
+            GameManager.Instance.EscapeFromGameScene();
         }
     }
 
@@ -43,9 +41,7 @@ public class GameUserInputController : MonoBehaviour {
             {
                 if (Input.GetMouseButtonDown(0))
                 {
-                    AudioManager.Instance.PlayReturnSFX();
-                    GameManager.Instance.ReturnToMenu();
-
+                    GameManager.Instance.EndGameClickAction();
                 }
             }
 

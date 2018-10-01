@@ -30,8 +30,23 @@ public class NetworkMenu : MonoBehaviour {
 
     private void Start()
     {
-        myNetwork.StartLookingForMatches();
+        // prevent entering this scene as networktype menu
+        if (GameManager.networkType == NetworkType.Local) GameManager.networkType = NetworkType.LAN;
+
         playerNameDisplay.text = myNetwork.playerName;
+
+        // start looking for match
+        switch (GameManager.networkType)
+        {
+            case NetworkType.LAN:
+                myNetwork.StartLookingForMatchesOnLAN();
+                break;
+            case NetworkType.Internet:
+                myNetwork.StartLookingForMatchesOnInternet();
+                break;
+            default:
+                break;
+        }
     }
 
     private void Update()
@@ -58,8 +73,7 @@ public class NetworkMenu : MonoBehaviour {
 
         foreach (NetworkBroadcastResult result in MyNetworkManager.Discovery.broadcastsReceived.Values)
         {
-            string matchData = Encoding.Unicode.GetString(result.broadcastData);
-
+            
             NetworkMatchData match;
             
             try

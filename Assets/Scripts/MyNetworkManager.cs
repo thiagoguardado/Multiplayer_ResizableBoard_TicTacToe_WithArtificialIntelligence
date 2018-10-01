@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public enum NetworkType {LAN, Internet}
 
 public class MyNetworkManager : NetworkManager {
 
@@ -16,8 +15,6 @@ public class MyNetworkManager : NetworkManager {
             return singleton.GetComponent<MyNetworkDiscovery>();
         }
     }
-
-    public static NetworkType NetworkType { get; set; }
 
     public static bool isBroadcasting = false;
 
@@ -41,7 +38,15 @@ public class MyNetworkManager : NetworkManager {
 
     //}
 
-    public void StartLookingForMatches()
+    #region Internet
+    public void StartLookingForMatchesOnInternet()
+    {
+        throw new NotImplementedException();
+    }
+    #endregion
+
+    #region LAN
+    public void StartLookingForMatchesOnLAN()
     {
         Discovery.InitializeAsClient();
     }
@@ -64,6 +69,7 @@ public class MyNetworkManager : NetworkManager {
         isConnected = true;
         UnityEngine.SceneManagement.SceneManager.LoadScene("NetworkGameLobby");
     }
+    #endregion
 
 
     public override void OnClientConnect(NetworkConnection conn)
@@ -136,10 +142,15 @@ public class MyNetworkManager : NetworkManager {
                 }
             }
 
+            /*/
             if (BoardManager.Instance.Board.CurrentPlayer.playerSymbol == disconnectedPlayer.playerSymbol)
             {
                 BoardManager.Instance.AddPlayerToBoard(-1);
             }
+            /*/
+
+            // remove player from game
+            BoardManager.Instance.TriggerPlayerRemoval(disconnectedPlayer.playerSymbol);
 
         }
         

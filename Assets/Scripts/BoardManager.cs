@@ -73,7 +73,9 @@ public class BoardManager : MonoBehaviour {
 
     public delegate void BoardChange(int position);
     public delegate void BoardAction();
+    public delegate void BoardPlayerAction(PlayerSymbol symbol);
     public static event BoardChange AddedPlayerToBoard;
+    public static event BoardPlayerAction RemovePlayerFromBoard;
     public static event BoardAction BoardInitialized;
 
     private void Awake() {
@@ -167,6 +169,30 @@ public class BoardManager : MonoBehaviour {
         m_currentResult = GameResult.None;
         m_board.SetPlayer(players[0]);
     }
+
+    public void RemovePlayer(PlayerSymbol playerToRemove)
+    {
+        GamePlayer player = null;
+        foreach (var p in players)
+        {
+            if (p.playerSymbol == playerToRemove)
+            {
+                player = p;
+            }
+        }
+
+        if (player != null) players.Remove(player);
+
+        Board.RemovePlayer(playerToRemove);
+
+    }
+
+    public void TriggerPlayerRemoval(PlayerSymbol symbol)
+    {
+        if (RemovePlayerFromBoard != null) RemovePlayerFromBoard.Invoke(symbol);
+    }
+
+
 
     /// <summary>
     /// Checks if game is concluded
@@ -285,6 +311,7 @@ public class BoardManager : MonoBehaviour {
                 return 1;
         }
     }
+
 
 
 }
@@ -995,6 +1022,29 @@ public struct Board
         return null;
     }
 
+
+    public void RemovePlayer(PlayerSymbol playerSymbol)
+    {
+        if (currentPlayer.playerSymbol == playerSymbol)
+        {
+            currentPlayer = NextPlayer();
+        }
+
+        GamePlayer player = null;
+        foreach (var p in players)
+        {
+            if (p.playerSymbol == playerSymbol)
+            {
+                player = p;
+                break;
+            }
+        }
+
+        if (player != null)
+        {
+            players.Remove(player);
+        }
+    }
 
 }
 

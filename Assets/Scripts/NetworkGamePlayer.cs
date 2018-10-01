@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -6,21 +7,19 @@ using UnityEngine.Networking;
 public class NetworkGamePlayer : NetworkBehaviour {
 
     public MyNetworkManager mynetworkManager { get; private set; }
-    float timer = 1f;
-    float refreshTime = 1f;
-
-    private bool canPlay = false;
 
     private void OnEnable()
     {
         BoardManager.AddedPlayerToBoard += TriggerCommandPlayerAdded;
         BoardManager.BoardInitialized += UpdateCurrentPlayer;
+        BoardManager.RemovePlayerFromBoard += TriggerPlayerRemoved;
     }
 
     private void OnDisable()
     {
         BoardManager.AddedPlayerToBoard -= TriggerCommandPlayerAdded;
         BoardManager.BoardInitialized -= UpdateCurrentPlayer;
+        BoardManager.RemovePlayerFromBoard -= TriggerPlayerRemoved;
     }
 
     private void Awake()
@@ -44,6 +43,20 @@ public class NetworkGamePlayer : NetworkBehaviour {
             UpdateCurrentPlayer();
             CmdPlayerAddedToBoard(positionAdded);
         }
+    }
+
+    private void TriggerPlayerRemoved(PlayerSymbol symbol)
+    {
+        if (isLocalPlayer && isServer)
+        {
+            RpcPlayerRemovedFromBoard(symbol);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcPlayerRemovedFromBoard(PlayerSymbol symbol)
+    {
+        BoardManager.Instance.RemovePlayer(symbol);
     }
 
     [Command]

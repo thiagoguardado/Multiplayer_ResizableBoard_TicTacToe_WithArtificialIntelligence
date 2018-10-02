@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
+using UnityEngine.Networking.Match;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -51,7 +52,6 @@ public class NetworkMenu : MonoBehaviour {
 
     private void Update()
     {
-
         if (!myNetwork.isConnected)
         {
             refreshListTimer -= Time.deltaTime;
@@ -59,15 +59,96 @@ public class NetworkMenu : MonoBehaviour {
             if (refreshListTimer <= 0f)
             {
                 refreshListTimer = refreshListTime;
-                RefreshGames();
+                if(GameManager.networkType == NetworkType.LAN)
+                {
+                    RefreshGamesOnLAN();
+                } else if (GameManager.networkType == NetworkType.Internet)
+                {
+                    RefreshGamesOnInternet();
+                }
                 
             }
 
         }
     }
 
+    private void RefreshGamesOnInternet()
+    {
+        _matchesToDisplay.Clear();
+
+        myNetwork.ListMatchesOnInternet(OnMatchList);
+
+    }
+
+    private void OnMatchList(bool success, string extendedInfo, List<MatchInfoSnapshot> matchList)
+    {
+        myNetwork.OnMatchList(success, extendedInfo, matchList);
+
+        if (success)
+        {
+            Debug.Log("match list found");
+
+
+            foreach (MatchInfoSnapshot result in matchList)
+            {
+
+                NetworkMatchData match;
+
+                try
+                {
+                    match = new NetworkMatchData(result.name, possibleSymbols, "", (ulong)result.networkId);
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError(e.Message);
+                    continue;
+                }
+
+                _matchesToDisplay.Add(match);
+            }
+
+
+            List<NetworkGameSelectionMatch> updatedGames = new List<NetworkGameSelectionMatch>();
+
+            for (int i = 0; i < _matchesToDisplay.Count; i++)
+            {
+
+                bool found = false;
+                for (int j = 0; j < _currentMatchesDisplayed.Count; j++)
+                {
+                    if (_currentMatchesDisplayed[j].thisMatchData.matchName == _matchesToDisplay[i].matchName)
+                    {
+                        _currentMatchesDisplayed[j].Setup(_matchesToDisplay[i]);
+                        updatedGames.Add(_currentMatchesDisplayed[j]);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    updatedGames.Add(AddMatchToList(_matchesToDisplay[i]));
+                }
+            }
+
+
+            NetworkGameSelectionMatch[] gamesToDelete = _currentMatchesDisplayed.Except(updatedGames).ToArray();
+            foreach (var item in gamesToDelete)
+            {
+                RemoveMatchFromList(item);
+            }
+
+
+        }
+        else
+        {
+            Debug.Log("error on match list");
+        }
+    }
+
+
     #region Display
-    private void RefreshGames()
+    private void RefreshGamesOnLAN()
     {
         _matchesToDisplay.Clear();
 
@@ -78,7 +159,7 @@ public class NetworkMenu : MonoBehaviour {
             
             try
             {
-                match = new NetworkMatchData(result, possibleSymbols,"");
+                match = new NetworkMatchData(Encoding.Unicode.GetString(result.broadcastData), possibleSymbols,"",(ulong)0);
             }
             catch (System.Exception e)
             {
@@ -140,10 +221,22 @@ public class NetworkMenu : MonoBehaviour {
         if (ValidateMatchName(newMatchName))
         {
             popup.ClosePopup();
-            myNetwork.StartBroadcastingNewMatch(newMatchName);
+
+            if (GameManager.networkType == NetworkType.LAN)
+            {
+                myNetwork.StartBroadcastingNewMatch(newMatchName);
+            } else if (GameManager.networkType == NetworkType.Internet)
+            {
+                myNetwork.CreateNewMatchOnInternet(newMatchName,OnMatchCreate);
+            }
         }
     }
 
+    private void OnMatchCreate(bool success, string extendedInfo, MatchInfo matchInfo)
+    {
+        myNetwork.OnMatchCreate(success, extendedInfo, matchInfo);
+
+    }
 
     private bool ValidateMatchName(string matchName)
     {
@@ -203,19 +296,19 @@ public class NetworkMatchData
 
     public string matchName;
     [SerializeField] public NetworkPlayer[] playersOnLobby = new NetworkPlayer[0];
-    public string serverAddress;
+    public ulong netID;
+
     public NetworkMatchData() { }
 
-
-    public NetworkMatchData(string matchName, string serverAddress)
+    public NetworkMatchData(string matchName)
     {
         this.matchName = matchName;
-        this.serverAddress = NetworkManager.singleton.networkAddress;
     }
 
-    public NetworkMatchData(NetworkBroadcastResult broadcastResult, PlayerSymbols playerSymbols, string playerName) 
+    public NetworkMatchData(string broadcastedData, PlayerSymbols playerSymbols, string playerName, ulong netID) 
     {
-        string[] splitted = Encoding.Unicode.GetString(broadcastResult.broadcastData).Split('_');
+        this.netID = netID;
+        string[] splitted = broadcastedData.Split('_');
         matchName = splitted[0];
         string[] splittedPlayers = splitted[1].Split('|');
         List<NetworkPlayer> list = new List<NetworkPlayer>();
@@ -252,7 +345,6 @@ public class NetworkMatchData
             list.Add(new NetworkPlayer(symbol, color, name, -1));
         }
         playersOnLobby = list.ToArray();
-        serverAddress = broadcastResult.serverAddress;
     }
 
     public static string CreateMatchBroadcastData(string matchName, Player[] players, int nextPlayerID)

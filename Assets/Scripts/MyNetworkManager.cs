@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-
+using UnityEngine.Networking.Match;
 
 public class MyNetworkManager : NetworkManager {
 
@@ -31,6 +31,9 @@ public class MyNetworkManager : NetworkManager {
     private void Start()
     {
         isConnected = false;
+
+        if (GameManager.networkType == NetworkType.Internet)
+            StartMatchMaker();
     }
 
     //private void Update()
@@ -41,8 +44,39 @@ public class MyNetworkManager : NetworkManager {
     #region Internet
     public void StartLookingForMatchesOnInternet()
     {
-        throw new NotImplementedException();
+        StartMatchMaker();
     }
+
+    public void ListMatchesOnInternet(NetworkMatch.DataResponseDelegate<List<MatchInfoSnapshot>> callback)
+    {
+        matchMaker.ListMatches(0, 0, "", false, 0, 0, callback);
+    }
+
+    public void CreateNewMatchOnInternet(string newMatchName, NetworkMatch.DataResponseDelegate<MatchInfo> callback)
+    {
+        currentMatch = new NetworkMatchData(newMatchName);
+        isConnected = true;
+        matchMaker.CreateMatch(NetworkMatchData.CreateMatchBroadcastData(currentMatch), 4, true, "", "", "", 0, 0, callback);
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene("NetworkGameLobby");
+    }
+
+    public void ConnectToAMatchInternet(NetworkMatchData matchData)
+    {
+
+        matchMaker.JoinMatch((UnityEngine.Networking.Types.NetworkID)matchData.netID, "", "", "", 0, 0, OnMatchJoined);
+        singleton.StartClient();
+        isConnected = true;
+        UnityEngine.SceneManagement.SceneManager.LoadScene("NetworkGameLobby");
+    }
+
+    public override void OnMatchJoined(bool success, string extendedInfo, MatchInfo matchInfo)
+    {
+        base.OnMatchJoined(success, extendedInfo, matchInfo);
+
+        Debug.Log("internet connected");
+    }
+
     #endregion
 
     #region LAN
@@ -53,7 +87,7 @@ public class MyNetworkManager : NetworkManager {
 
     public void StartBroadcastingNewMatch(string newMatchName)
     {
-        currentMatch = new NetworkMatchData(newMatchName, singleton.networkAddress);
+        currentMatch = new NetworkMatchData(newMatchName);
         singleton.StartHost();
         isConnected = true;
 
@@ -61,10 +95,8 @@ public class MyNetworkManager : NetworkManager {
 
     }
 
-    public void ConnectToAMatch(NetworkMatchData matchData)
+    public void ConnectToAMatchLAN(NetworkMatchData matchData)
     {
-
-        singleton.networkAddress = matchData.serverAddress;
         singleton.StartClient();
         isConnected = true;
         UnityEngine.SceneManagement.SceneManager.LoadScene("NetworkGameLobby");
@@ -109,18 +141,23 @@ public class MyNetworkManager : NetworkManager {
 
         base.OnServerConnect(conn);
 
-        StartCoroutine(RefreshBroadcastInfo());
-
         NetworkGameLobbyView netView = GetComponent<NetworkGameLobbyView>();
         if (netView != null)
         {
             netView.UpdateView();
         }
 
-        if (currentMatch.playersOnLobby.Length >= 4)
+        if (GameManager.networkType == NetworkType.LAN)
         {
-            //Stop broadcast
-            Discovery.MyStopBroadcast();
+            StartCoroutine(RefreshBroadcastInfo());
+            if (currentMatch.playersOnLobby.Length >= 4)
+            {
+                //Stop broadcast
+                Discovery.MyStopBroadcast();
+            }
+        } else if (GameManager.networkType == NetworkType.Internet)
+        {
+            //
         }
 
     }
@@ -152,6 +189,7 @@ public class MyNetworkManager : NetworkManager {
             // remove player from game
             BoardManager.Instance.TriggerPlayerRemoval(disconnectedPlayer.playerSymbol);
 
+
         }
         
         currentMatch.RemovePlayer(currentConnections[conn]);
@@ -159,10 +197,16 @@ public class MyNetworkManager : NetworkManager {
 
         base.OnServerDisconnect(conn);
 
-        if (currentMatch.playersOnLobby.Length <4)
+        if (GameManager.networkType == NetworkType.LAN)
         {
-            //restart broadcast
-            StartCoroutine(RefreshBroadcastInfo());
+            if (currentMatch.playersOnLobby.Length < 4)
+            {
+                //restart broadcast
+                StartCoroutine(RefreshBroadcastInfo());
+            }
+        } else if (GameManager.networkType == NetworkType.Internet)
+        {
+            
         }
 
         //foreach (var netID in FindObjectsOfType<NetworkIdentity>())

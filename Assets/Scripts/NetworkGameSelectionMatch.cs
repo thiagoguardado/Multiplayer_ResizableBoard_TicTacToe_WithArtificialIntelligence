@@ -45,7 +45,16 @@ public class NetworkGameSelectionMatch : MonoBehaviour {
 
     public void OnClick()
     {
-        GameObject.FindObjectOfType<MyNetworkManager>().ConnectToAMatch(thisMatchData);
+        MyNetworkManager myNetworkManager = FindObjectOfType<MyNetworkManager>();
+
+        if(myNetworkManager!=null){
+            if(GameManager.networkType == NetworkType.LAN)
+            {
+                myNetworkManager.ConnectToAMatchLAN(thisMatchData);
+            } else {
+                myNetworkManager.ConnectToAMatchInternet(thisMatchData);
+            }
+        }
 
     }
 

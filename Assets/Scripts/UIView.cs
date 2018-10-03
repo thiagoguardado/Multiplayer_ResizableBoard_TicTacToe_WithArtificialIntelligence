@@ -10,8 +10,11 @@ using UnityEngine.UI;
 public class UIView : MonoBehaviour {
 
     private PlayerSprite currentPlayer;
+    private string currentPlayerName;
     public Image nextPlayerImage;
     public Image playerWinImage;
+    public Text nextPlayerName;
+    public Text playerWinName;
 
     public GameObject nextPlayerPanel;
     public GameObject playerWinPanel;
@@ -70,8 +73,17 @@ public class UIView : MonoBehaviour {
         if (BoardManager.Instance.Board.CurrentPlayer.playerSprite != currentPlayer)
         {
             currentPlayer = BoardManager.Instance.Board.CurrentPlayer.playerSprite;
+            currentPlayerName = GameManager.GetPlayerNameBySymbol(BoardManager.Instance.Board.CurrentPlayer.playerSymbol);
+
             nextPlayerImage.sprite = currentPlayer.sprite;
             nextPlayerImage.color = currentPlayer.color;
+            if (currentPlayerName != null) {
+                nextPlayerName.gameObject.SetActive(true);
+                nextPlayerName.text = currentPlayerName;
+                nextPlayerName.color = currentPlayer.color;
+            } else {
+                nextPlayerName.gameObject.SetActive(false);
+            }
             nextPlayerAnimator.SetTrigger("tilt");
 
         }
@@ -90,6 +102,18 @@ public class UIView : MonoBehaviour {
 
         playerWinImage.sprite = winningPlayer.playerSprite.sprite;
         playerWinImage.color = winningPlayer.playerSprite.color;
+        string winnningPlayerName = GameManager.GetPlayerNameBySymbol(winningPlayer.playerSymbol);
+
+        if (winnningPlayerName != null)
+        {
+            playerWinName.gameObject.SetActive(true);
+            playerWinName.text = winnningPlayerName;
+            playerWinName.color = winningPlayer.playerSprite.color;
+        }
+        else
+        {
+            playerWinName.gameObject.SetActive(false);
+        }
 
         updatingNextPlayer = false;
 

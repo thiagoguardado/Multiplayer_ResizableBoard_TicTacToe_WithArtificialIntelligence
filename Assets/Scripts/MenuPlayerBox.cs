@@ -58,7 +58,11 @@ public class MenuPlayerBox : MonoBehaviour {
     {
         GameManager.players[index].color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
 
-        if (animateChange) EffectivateChange();
+        if (animateChange)
+        {
+            imageAnimator.SetTrigger("change");
+            EffectivateChange();
+        }
 
     }
 
@@ -66,14 +70,17 @@ public class MenuPlayerBox : MonoBehaviour {
     {
         GameManager.players[index].playerType = (PlayerType)(((int)GameManager.players[index].playerType + 1) % Enum.GetValues(typeof(PlayerType)).Length);
 
-        if (animateChange) EffectivateChange();
+        if (animateChange)
+        {
+            textAnimator.SetTrigger("change");
+            EffectivateChange();
+        }
 
     }
 
     public void EffectivateChange()
     {
         menuView.UpdateView();
-        textAnimator.SetTrigger("change");
         AudioManager.Instance.PlayOptionSelectSFX();
     }
 

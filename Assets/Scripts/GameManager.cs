@@ -102,13 +102,15 @@ public class GameManager : MonoBehaviour {
     /// <summary>
     /// Return to menu after finished game on lan
     /// </summary>
-    public void ReturnToLanMenu()
+    public void ReturnToNetworkMenu()
     {
         MyNetworkManager.ClientDisconnectAll();
         SceneManager.LoadScene("NetworkGameSetup");
         AudioManager.Instance.ChangeToMenuMusic();
         gameState = GameState.Menu;
     }
+
+
 
     /// <summary>
     /// Returns to title screen
@@ -154,6 +156,17 @@ public class GameManager : MonoBehaviour {
             initialized = true;
         }
     }
+
+    public static string GetPlayerNameBySymbol(PlayerSymbol symbol)
+    {
+        foreach (var player in players)
+        {
+            if (player.playerSymbolAndSprite.playerSymbol == symbol) return player.playerName;
+        }
+
+        return null;
+    }
+
 
     /// <summary>
     /// Change number of players
@@ -243,6 +256,10 @@ public class GameManager : MonoBehaviour {
                 AudioManager.Instance.PlayReturnSFX();
                 Instance.ReturnToMenu();
                 break;
+            case NetworkType.LAN:
+            case NetworkType.Internet:
+                Instance.ReturnToNetworkMenu();
+                break;
             default:
                 break;
         }
@@ -259,9 +276,11 @@ public class GameManager : MonoBehaviour {
                 Instance.ReturnToMenu();
                 break;
             case NetworkType.LAN:
-                Instance.ReturnToLanMenu();
+            case NetworkType.Internet:
+                Instance.ReturnToNetworkMenu();
                 break;
             default:
+                Instance.ReturnToNetworkMenu();
                 break;
         }
 

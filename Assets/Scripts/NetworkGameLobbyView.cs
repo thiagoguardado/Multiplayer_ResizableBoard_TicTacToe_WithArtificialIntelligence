@@ -18,37 +18,25 @@ public class NetworkGameLobbyView : MenuView
     public Button lessSignButton;
     public Button greaterSignButton;
 
-    private bool onlyClient = false;
+    private bool onlyClient = true;
     public MyNetworkManager myNetworkManager { get; private set; }
 
     void Start()
     {
-
         myNetworkManager = NetworkManager.singleton.GetComponent<MyNetworkManager>();
 
-        // se cliente
-        if (NetworkClient.active && !NetworkServer.active)
-        {
-            onlyClient = true;
-        }
+        playButton.interactable = false;
+        lessSignButton.gameObject.SetActive(false);
+        greaterSignButton.gameObject.SetActive(false);
+        playButton.interactable = false;
 
-        if (onlyClient)
-        {
-            playButton.interactable = false;
-            lessSignButton.gameObject.SetActive(false);
-            greaterSignButton.gameObject.SetActive(false);
-        } else
-        {
-            playButton.interactable = !(myNetworkManager.currentMatch.playersOnLobby.Length < 2);
-        }
-
-        
-
+        UpdateView();
     }
 
 
     void Update()
     {
+
         if (lobby == null)
         {
             lobby = FindObjectOfType<NetworkGameLobby>();
@@ -62,25 +50,28 @@ public class NetworkGameLobbyView : MenuView
 
     public override void UpdateView()
     {
+        UpdateButtons();
         UpdateBoardSize();
-        UpdateMenuPlayerBoxes();
-        UpdatePlayButton();
+        UpdateMenuPlayerBoxes(); 
     }
 
-    private void UpdatePlayButton()
+    private void UpdateButtons()
     {
-        if(!onlyClient)
+        // se cliente
+        if (NetworkServer.active)
+        {
+            onlyClient = false;
+        }
+
+        if (!onlyClient)
+        {
+            playButton.interactable = true;
+            lessSignButton.gameObject.SetActive(true);
+            greaterSignButton.gameObject.SetActive(true);
             playButton.interactable = !(myNetworkManager.currentMatch.playersOnLobby.Length < 2);
+        }
     }
 
-    private void UpdateBoardSize()
-    {
-        boardSize.text = GameManager.boardSize.ToString();
-
-        // checkButtons
-        CheckLesserAndGreaterSigns(GameManager.boardSize, MenuManager.Instance.PossibleBoardSize, boardSizeLesserSign, boardSizeGreaterSign);
-
-    }
 
     private void CheckLesserAndGreaterSigns(int currentNumber, int[] possibleNumbers, Image numberLesserSign, Image numberGreaterSign)
     {

@@ -14,11 +14,16 @@ public class MenuViewOffline : MenuView
     public Image numberOfPlayersGreaterSign;
     public Image numberOfPlayersLesserSign;
 
+    private void Start()
+    {
+        UpdateView();
+    }
+
     public override void UpdateView()
     {
         UpdateNumberOfPlayers();
         UpdateMenuPlayerBoxes();
-
+        UpdateBoardSize();
     }
 
     private void CheckLesserAndGreaterSigns(int currentNumber, int[] possibleNumbers, Image numberLesserSign, Image numberGreaterSign)

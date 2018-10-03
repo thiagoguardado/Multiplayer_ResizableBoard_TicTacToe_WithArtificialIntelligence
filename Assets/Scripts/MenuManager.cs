@@ -60,8 +60,7 @@ public class MenuManager : MonoBehaviour {
             NetworkGameLobby[] clientsScript = FindObjectsOfType<NetworkGameLobby>();
             foreach (var script in clientsScript)
             {
-                if(script.isLocalPlayer) script.RpcChangeBoardSize(GameManager.boardSize);
-                break;
+                script.TriggerBoardSizeChange();
             }
         }
     }

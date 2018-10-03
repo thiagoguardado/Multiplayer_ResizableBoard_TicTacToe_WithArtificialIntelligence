@@ -82,6 +82,11 @@ public class NetworkGameLobby : NetworkBehaviour {
         RpcStartGame(mynetworkManager.currentMatch, GameManager.boardSize);
     }
 
+    public void TriggerBoardSizeChange()
+    {
+        if(isLocalPlayer)
+            RpcChangeBoardSize(GameManager.boardSize);
+    }
 
     [TargetRpc]
     private void TargetUpdatePlayerID(NetworkConnection target, int playerID)
@@ -136,6 +141,7 @@ public class NetworkGameLobby : NetworkBehaviour {
     [ClientRpc]
     public void RpcChangeBoardSize(int newBoardSize)
     {
+        Debug.Log("received rpc change board size");
         MenuManager.Instance.EffectivateBoardSizeChange();
         GameManager.boardSize = newBoardSize;
     }

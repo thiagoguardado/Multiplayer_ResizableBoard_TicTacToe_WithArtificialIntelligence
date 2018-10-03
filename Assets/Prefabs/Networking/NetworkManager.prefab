@@ -127,14 +127,13 @@ MonoBehaviour:
   currentMatch:
     matchName: 
     playersOnLobby: []
-    serverAddress: 
-  currentConnectionsIDs: 
+    netID: 0
   playerName: Player
   currentPlayer:
     playerSymbol: 0
     color: {r: 0, g: 0, b: 0, a: 0}
     playerName: 
-    connectionID: 0
+    playerID: 0
 --- !u!114 &114660800717553030
 MonoBehaviour:
   m_ObjectHideFlags: 1

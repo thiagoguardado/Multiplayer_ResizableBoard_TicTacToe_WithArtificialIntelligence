@@ -26,8 +26,8 @@ public class MyNetworkManager : NetworkManager {
     private int nextPlayerID = 0;
 
     public bool isConnected { get; private set; }
+    public bool lookingForMatches { get; private set; }
 
-    
     private void Start()
     {
         isConnected = false;
@@ -36,45 +36,40 @@ public class MyNetworkManager : NetworkManager {
             StartMatchMaker();
     }
 
-    //private void Update()
-    //{
-
-    //}
-
     #region Internet
     public void StartLookingForMatchesOnInternet()
     {
+        lookingForMatches = true;
         StartMatchMaker();
     }
 
     public void ListMatchesOnInternet(NetworkMatch.DataResponseDelegate<List<MatchInfoSnapshot>> callback)
     {
-        matchMaker.ListMatches(0, 0, "", false, 0, 0, callback);
+        matchMaker.ListMatches(0, 10, "", false, 0, 0, callback);
     }
 
     public void CreateNewMatchOnInternet(string newMatchName, NetworkMatch.DataResponseDelegate<MatchInfo> callback)
     {
         currentMatch = new NetworkMatchData(newMatchName);
         isConnected = true;
-        matchMaker.CreateMatch(NetworkMatchData.CreateMatchBroadcastData(currentMatch), 4, true, "", "", "", 0, 0, callback);
+        string broadcastData = NetworkMatchData.CreateMatchBroadcastData(currentMatch);
+
+        matchMaker.CreateMatch(broadcastData, 4, true, "", "", "", 0, 0, callback);
 
         UnityEngine.SceneManagement.SceneManager.LoadScene("NetworkGameLobby");
     }
 
     public void ConnectToAMatchInternet(NetworkMatchData matchData)
     {
-
         matchMaker.JoinMatch((UnityEngine.Networking.Types.NetworkID)matchData.netID, "", "", "", 0, 0, OnMatchJoined);
-        singleton.StartClient();
         isConnected = true;
+        lookingForMatches = false;
         UnityEngine.SceneManagement.SceneManager.LoadScene("NetworkGameLobby");
     }
 
     public override void OnMatchJoined(bool success, string extendedInfo, MatchInfo matchInfo)
     {
         base.OnMatchJoined(success, extendedInfo, matchInfo);
-
-        Debug.Log("internet connected");
     }
 
     #endregion
@@ -82,6 +77,7 @@ public class MyNetworkManager : NetworkManager {
     #region LAN
     public void StartLookingForMatchesOnLAN()
     {
+        lookingForMatches = true;
         Discovery.InitializeAsClient();
     }
 
@@ -92,13 +88,13 @@ public class MyNetworkManager : NetworkManager {
         isConnected = true;
 
         UnityEngine.SceneManagement.SceneManager.LoadScene("NetworkGameLobby");
-
     }
 
     public void ConnectToAMatchLAN(NetworkMatchData matchData)
     {
         singleton.StartClient();
         isConnected = true;
+        lookingForMatches = false;
         UnityEngine.SceneManagement.SceneManager.LoadScene("NetworkGameLobby");
     }
     #endregion
@@ -149,7 +145,7 @@ public class MyNetworkManager : NetworkManager {
 
         if (GameManager.networkType == NetworkType.LAN)
         {
-            StartCoroutine(RefreshBroadcastInfo());
+            StartCoroutine(RefreshBroadcastInfoLAN());
             if (currentMatch.playersOnLobby.Length >= 4)
             {
                 //Stop broadcast
@@ -157,11 +153,11 @@ public class MyNetworkManager : NetworkManager {
             }
         } else if (GameManager.networkType == NetworkType.Internet)
         {
+            //StartCoroutine(RefreshBroadcastInfoInternet());
             //
         }
 
     }
-
 
     public override void OnServerDisconnect(NetworkConnection conn)
     {
@@ -178,15 +174,7 @@ public class MyNetworkManager : NetworkManager {
                     break;
                 }
             }
-
-            /*/
-            if (BoardManager.Instance.Board.CurrentPlayer.playerSymbol == disconnectedPlayer.playerSymbol)
-            {
-                BoardManager.Instance.AddPlayerToBoard(-1);
-            }
-            /*/
-
-            // remove player from game
+            
             BoardManager.Instance.TriggerPlayerRemoval(disconnectedPlayer.playerSymbol);
 
 
@@ -202,27 +190,37 @@ public class MyNetworkManager : NetworkManager {
             if (currentMatch.playersOnLobby.Length < 4)
             {
                 //restart broadcast
-                StartCoroutine(RefreshBroadcastInfo());
+                StartCoroutine(RefreshBroadcastInfoLAN());
             }
         } else if (GameManager.networkType == NetworkType.Internet)
         {
-            
+            if (currentMatch.playersOnLobby.Length < 4)
+            {
+                //restart broadcast
+                //StartCoroutine(RefreshBroadcastInfoInternet());
+            }
         }
-
-        //foreach (var netID in FindObjectsOfType<NetworkIdentity>())
-        //{
-        //    if (netID.netId.Value == conn.connectionId) Destroy(netID.gameObject);
-        //}
+        
 
     }
 
-    private IEnumerator RefreshBroadcastInfo()
+    private IEnumerator RefreshBroadcastInfoLAN()
     {
         Discovery.MyStopBroadcast();
         Discovery.broadcastData = NetworkMatchData.CreateMatchBroadcastData(currentMatch);
         yield return null;
         Discovery.RestartAsServer();
     }
+
+
+    private IEnumerator RefreshBroadcastInfoInternet()
+    {
+        StopMatchMaker();
+        yield return null;
+        StartMatchMaker();        
+        matchMaker.CreateMatch(NetworkMatchData.CreateMatchBroadcastData(currentMatch), 4, true, "", "", "", 0, 0, OnMatchCreate);
+    }
+
 
     public static void ClientDisconnectAll()
     {

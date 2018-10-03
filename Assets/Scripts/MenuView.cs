@@ -22,7 +22,7 @@ public abstract class MenuView : MonoBehaviour {
 
     public abstract void UpdateView();
 
-    private void UpdateBoardSize()
+    protected void UpdateBoardSize()
     {
         boardSize.text = GameManager.boardSize.ToString();
 

@@ -24,6 +24,8 @@ public class NetworkMenu : MonoBehaviour {
     private List<NetworkMatchData> _matchesToDisplay = new List<NetworkMatchData>();
     private List<NetworkGameSelectionMatch> _currentMatchesDisplayed = new List<NetworkGameSelectionMatch>();
 
+    bool finishedListingMatches = true;
+
     private void Awake()
     {
         myNetwork = NetworkManager.singleton.gameObject.GetComponent<MyNetworkManager>();
@@ -58,12 +60,13 @@ public class NetworkMenu : MonoBehaviour {
 
             if (refreshListTimer <= 0f)
             {
-                refreshListTimer = refreshListTime;
                 if(GameManager.networkType == NetworkType.LAN)
                 {
+                    refreshListTimer = refreshListTime;
                     RefreshGamesOnLAN();
-                } else if (GameManager.networkType == NetworkType.Internet)
+                } else if (GameManager.networkType == NetworkType.Internet && finishedListingMatches)
                 {
+                    refreshListTimer = refreshListTime;
                     RefreshGamesOnInternet();
                 }
                 
@@ -76,73 +79,79 @@ public class NetworkMenu : MonoBehaviour {
     {
         _matchesToDisplay.Clear();
 
+        finishedListingMatches = false;
         myNetwork.ListMatchesOnInternet(OnMatchList);
 
     }
 
     private void OnMatchList(bool success, string extendedInfo, List<MatchInfoSnapshot> matchList)
     {
-        myNetwork.OnMatchList(success, extendedInfo, matchList);
-
-        if (success)
+        if (myNetwork.lookingForMatches)
         {
-            Debug.Log("match list found");
 
+            myNetwork.OnMatchList(success, extendedInfo, matchList);
 
-            foreach (MatchInfoSnapshot result in matchList)
+            if (success)
             {
 
-                NetworkMatchData match;
-
-                try
+                foreach (MatchInfoSnapshot result in matchList)
                 {
-                    match = new NetworkMatchData(result.name, possibleSymbols, "", (ulong)result.networkId);
-                }
-                catch (System.Exception e)
-                {
-                    Debug.LogError(e.Message);
-                    continue;
-                }
 
-                _matchesToDisplay.Add(match);
-            }
+                    NetworkMatchData match;
 
-
-            List<NetworkGameSelectionMatch> updatedGames = new List<NetworkGameSelectionMatch>();
-
-            for (int i = 0; i < _matchesToDisplay.Count; i++)
-            {
-
-                bool found = false;
-                for (int j = 0; j < _currentMatchesDisplayed.Count; j++)
-                {
-                    if (_currentMatchesDisplayed[j].thisMatchData.matchName == _matchesToDisplay[i].matchName)
+                    try
                     {
-                        _currentMatchesDisplayed[j].Setup(_matchesToDisplay[i]);
-                        updatedGames.Add(_currentMatchesDisplayed[j]);
-                        found = true;
-                        break;
+                        match = new NetworkMatchData(result.name, possibleSymbols, "", (ulong)result.networkId);
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogError(e.Message);
+                        continue;
+                    }
+
+                    _matchesToDisplay.Add(match);
+                }
+
+
+                List<NetworkGameSelectionMatch> updatedGames = new List<NetworkGameSelectionMatch>();
+
+                for (int i = 0; i < _matchesToDisplay.Count; i++)
+                {
+
+                    bool found = false;
+                    for (int j = 0; j < _currentMatchesDisplayed.Count; j++)
+                    {
+                        if (_currentMatchesDisplayed[j].thisMatchData.matchName == _matchesToDisplay[i].matchName)
+                        {
+                            _currentMatchesDisplayed[j].Setup(_matchesToDisplay[i]);
+                            updatedGames.Add(_currentMatchesDisplayed[j]);
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        updatedGames.Add(AddMatchToList(_matchesToDisplay[i]));
                     }
                 }
 
-                if (!found)
+
+                NetworkGameSelectionMatch[] gamesToDelete = _currentMatchesDisplayed.Except(updatedGames).ToArray();
+                foreach (var item in gamesToDelete)
                 {
-                    updatedGames.Add(AddMatchToList(_matchesToDisplay[i]));
+                    RemoveMatchFromList(item);
                 }
+
+
             }
-
-
-            NetworkGameSelectionMatch[] gamesToDelete = _currentMatchesDisplayed.Except(updatedGames).ToArray();
-            foreach (var item in gamesToDelete)
+            else
             {
-                RemoveMatchFromList(item);
+                Debug.Log("error on match list");
             }
 
+            finishedListingMatches = true;
 
-        }
-        else
-        {
-            Debug.Log("error on match list");
         }
     }
 
@@ -307,44 +316,49 @@ public class NetworkMatchData
 
     public NetworkMatchData(string broadcastedData, PlayerSymbols playerSymbols, string playerName, ulong netID) 
     {
+        Debug.Log(broadcastedData);
+
         this.netID = netID;
-        string[] splitted = broadcastedData.Split('_');
+        string[] splitted = broadcastedData.Split(',');
         matchName = splitted[0];
-        string[] splittedPlayers = splitted[1].Split('|');
-        List<NetworkPlayer> list = new List<NetworkPlayer>();
-        for (int i = 0; i < splittedPlayers.Length; i++)
+        if (splitted[1].Length > 0)
         {
-
-            string colorHex = splittedPlayers[i].Substring(splittedPlayers[i].IndexOf("c=")+2,6);
-            string symbolName = splittedPlayers[i].Substring(splittedPlayers[i].IndexOf("s=") + 2, splittedPlayers[i].IndexOf("c=") - 2);
-            string name = splittedPlayers[i].Substring(splittedPlayers[i].IndexOf("n=") + 2, splittedPlayers[i].Length - splittedPlayers[i].IndexOf("n=") - 2);
-            
-            Color color;
-            if (!ColorUtility.TryParseHtmlString("#" + colorHex, out color))
+            string[] splittedPlayers = splitted[1].Split('|');
+            List<NetworkPlayer> list = new List<NetworkPlayer>();
+            for (int i = 0; i < splittedPlayers.Length; i++)
             {
-                throw new System.Exception("broadcast color data error");
-            }
 
+                string colorHex = splittedPlayers[i].Substring(splittedPlayers[i].IndexOf("c=") + 2, 6);
+                string symbolName = splittedPlayers[i].Substring(splittedPlayers[i].IndexOf("s=") + 2, splittedPlayers[i].IndexOf("c=") - 2);
+                string name = splittedPlayers[i].Substring(splittedPlayers[i].IndexOf("n=") + 2, splittedPlayers[i].Length - splittedPlayers[i].IndexOf("n=") - 2);
 
-            PlayerSymbol symbol = PlayerSymbol.Circle;
-            bool findSymbol = false;
-            for (int j = 0; j < playerSymbols.possiblePlayerSprites.Count; j++)
-            {
-                if (playerSymbols.possiblePlayerSprites[j].playerSymbol.ToString() == symbolName)
+                Color color;
+                if (!ColorUtility.TryParseHtmlString("#" + colorHex, out color))
                 {
-
-                    symbol = playerSymbols.possiblePlayerSprites[j].playerSymbol;
-                    findSymbol = true;
-                    break;
+                    throw new System.Exception("broadcast color data error");
                 }
+
+
+                PlayerSymbol symbol = PlayerSymbol.Circle;
+                bool findSymbol = false;
+                for (int j = 0; j < playerSymbols.possiblePlayerSprites.Count; j++)
+                {
+                    if (playerSymbols.possiblePlayerSprites[j].playerSymbol.ToString() == symbolName)
+                    {
+
+                        symbol = playerSymbols.possiblePlayerSprites[j].playerSymbol;
+                        findSymbol = true;
+                        break;
+                    }
+                }
+                if (!findSymbol)
+                {
+                    throw new System.Exception("broadcast sprite data error");
+                }
+                list.Add(new NetworkPlayer(symbol, color, name, -1));
             }
-            if (!findSymbol)
-            {
-                throw new System.Exception("broadcast sprite data error");
-            }
-            list.Add(new NetworkPlayer(symbol, color, name, -1));
+            playersOnLobby = list.ToArray();
         }
-        playersOnLobby = list.ToArray();
     }
 
     public static string CreateMatchBroadcastData(string matchName, Player[] players, int nextPlayerID)
@@ -361,7 +375,7 @@ public class NetworkMatchData
 
         }
 
-        return matchName +  "_" + playersData;
+        return matchName +  "," + playersData;
 
     }
 
@@ -377,7 +391,7 @@ public class NetworkMatchData
             playersData += "s=" + matchData.playersOnLobby[i].playerSymbol + "c=" + ColorUtility.ToHtmlStringRGB(matchData.playersOnLobby[i].color) + "n=" + matchData.playersOnLobby[i].playerName;
         }
 
-        return matchData.matchName + "_" + playersData;
+        return matchData.matchName + "," + playersData;
 
     }
 

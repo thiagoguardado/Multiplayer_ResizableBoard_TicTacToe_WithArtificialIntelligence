@@ -47,10 +47,6 @@ public class GameManager : MonoBehaviour {
 
     public delegate void GameAction();
     public static event GameAction GameStarted;
-
-
-
-
     public static event GameAction GameEnded;
 
     private void Awake()

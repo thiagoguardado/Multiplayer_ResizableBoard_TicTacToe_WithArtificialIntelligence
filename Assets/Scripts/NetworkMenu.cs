@@ -33,6 +33,8 @@ public class NetworkMenu : MonoBehaviour {
 
     private void Start()
     {
+        Debug.Log("start network menu");
+
         // prevent entering this scene as networktype menu
         if (GameManager.networkType == NetworkType.Local) GameManager.networkType = NetworkType.LAN;
 
@@ -54,7 +56,7 @@ public class NetworkMenu : MonoBehaviour {
 
     private void Update()
     {
-        if (!myNetwork.isConnected)
+        if (!MyNetworkManager.isConnected)
         {
             refreshListTimer -= Time.deltaTime;
 

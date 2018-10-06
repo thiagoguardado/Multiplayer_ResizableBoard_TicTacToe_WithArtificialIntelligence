@@ -48,7 +48,7 @@ public class BoardManager : MonoBehaviour {
 
 
 
-    public List<GamePlayer> players = new List<GamePlayer>(); // list of current players
+    public List<GamePlayer> boardManagerPlayers = new List<GamePlayer>(); // list of current players
     private Board m_board; // current game board object
     public Board Board
     {
@@ -87,7 +87,7 @@ public class BoardManager : MonoBehaviour {
         LoadSetup();
 
         // create board
-        m_board = new Board(boardSize, players, winningCheck, maxLineWidth);
+        m_board = new Board(boardSize, boardManagerPlayers, winningCheck, maxLineWidth);
 
         m_boardView = GetComponent<BoardView>();
 
@@ -96,14 +96,14 @@ public class BoardManager : MonoBehaviour {
 
 
         // initialize IA
-        for (int i = 0; i < players.Count; i++)
+        for (int i = 0; i < boardManagerPlayers.Count; i++)
         {
-            if (players[i].playerType == PlayerType.AI_Easy ||
-                players[i].playerType == PlayerType.AI_Medium ||
-                players[i].playerType == PlayerType.AI_Hard)
+            if (boardManagerPlayers[i].playerType == PlayerType.AI_Easy ||
+                boardManagerPlayers[i].playerType == PlayerType.AI_Medium ||
+                boardManagerPlayers[i].playerType == PlayerType.AI_Hard)
             {
                 AIManager ia = gameObject.AddComponent<AIManager>();
-                ia.Initialize(this, players[i], minimaxType,maxMinimaxDepth);
+                ia.Initialize(this, boardManagerPlayers[i], minimaxType,maxMinimaxDepth);
             }
         }
 
@@ -121,12 +121,12 @@ public class BoardManager : MonoBehaviour {
         {
             boardSize = GameManager.boardSize;
 
-            players.Clear();
+            boardManagerPlayers.Clear();
 
             for (int i = 0; i < GameManager.players.Count; i++)
             {
                 Player p = GameManager.players[i];
-                players.Add(new GamePlayer(p.playerSymbolAndSprite.playerSymbol, p.playerType, p.playerSymbolAndSprite.playerSprite, p.color));
+                boardManagerPlayers.Add(new GamePlayer(p.playerSymbolAndSprite.playerSymbol, p.playerType, p.playerSymbolAndSprite.playerSprite, p.color));
 
             }
 
@@ -154,26 +154,26 @@ public class BoardManager : MonoBehaviour {
         {
             Destroy(ias[i]);
         }
-        for (int i = 0; i < players.Count; i++)
+        for (int i = 0; i < boardManagerPlayers.Count; i++)
         {
-            if (players[i].playerType == PlayerType.AI_Easy ||
-                players[i].playerType == PlayerType.AI_Medium ||
-                players[i].playerType == PlayerType.AI_Hard)
+            if (boardManagerPlayers[i].playerType == PlayerType.AI_Easy ||
+                boardManagerPlayers[i].playerType == PlayerType.AI_Medium ||
+                boardManagerPlayers[i].playerType == PlayerType.AI_Hard)
             {
                 AIManager ia = gameObject.AddComponent<AIManager>();
-                ia.Initialize(this, players[i], minimaxType,maxMinimaxDepth);
+                ia.Initialize(this, boardManagerPlayers[i], minimaxType,maxMinimaxDepth);
             }
         }
 
         // change game result and set player one
         m_currentResult = GameResult.None;
-        m_board.SetPlayer(players[0]);
+        m_board.SetPlayer(boardManagerPlayers[0]);
     }
 
     public void RemovePlayer(PlayerSymbol playerToRemove)
     {
         GamePlayer player = null;
-        foreach (var p in players)
+        foreach (var p in boardManagerPlayers)
         {
             if (p.playerSymbol == playerToRemove)
             {
@@ -181,9 +181,9 @@ public class BoardManager : MonoBehaviour {
             }
         }
 
-        if (player != null) players.Remove(player);
+        if (player != null) boardManagerPlayers.Remove(player);
 
-        Board.RemovePlayer(playerToRemove);
+        Board.RemovePlayerFromBoard(playerToRemove);
 
     }
 
@@ -216,9 +216,9 @@ public class BoardManager : MonoBehaviour {
             if (m_board.AddPlayerToBoard(position, m_board.CurrentPlayer))
             {
                 int playerIndex = 0;
-                for (int i = 0; i < players.Count; i++)
+                for (int i = 0; i < boardManagerPlayers.Count; i++)
                 {
-                    if (players[i] == m_board.CurrentPlayer)
+                    if (boardManagerPlayers[i] == m_board.CurrentPlayer)
                     {
                         playerIndex = i;
                     }
@@ -340,7 +340,7 @@ public struct Board
         }
     }
 
-    private List<GamePlayer> players;   // players playing on board
+    private List<GamePlayer> boardPlayers;   // players playing on board
     private GamePlayer currentPlayer;   // current player playing
     public GamePlayer CurrentPlayer {
         get
@@ -371,7 +371,7 @@ public struct Board
         }
 
         // add players
-        players = _players;
+        boardPlayers = _players;
         currentPlayer = _players[0];
 
         // set up winning check
@@ -393,7 +393,7 @@ public struct Board
         {
             m_fullBoard.Add(referenceBoard.FullBoard[i]);
         }
-        players = referenceBoard.players;
+        boardPlayers = referenceBoard.boardPlayers;
         currentPlayer = referenceBoard.currentPlayer;
         m_maxWidth = referenceBoard.m_maxWidth;
         m_winningCheck = referenceBoard.m_winningCheck;
@@ -456,15 +456,17 @@ public struct Board
     /// <returns></returns>
     public GamePlayer NextPlayer()
     {
-        for (int i = 0; i < players.Count; i++)
+        Debug.Log("boardPlayers count: " + boardPlayers.Count);
+        for (int i = 0; i < boardPlayers.Count; i++)
         {
-            if (players[i] == currentPlayer)
+            Debug.Log("trying next player: " + boardPlayers[i].playerSymbol);
+            if (boardPlayers[i].playerSymbol == currentPlayer.playerSymbol)
             {
-                return players[(i + 1) % players.Count];
+                return boardPlayers[(i + 1) % boardPlayers.Count];
             }
         }
 
-        Debug.Log("Could not find next player");
+        Debug.Log("Could not find next player for current player " + currentPlayer.playerSymbol);
         return null;
     }
 
@@ -1023,15 +1025,16 @@ public struct Board
     }
 
 
-    public void RemovePlayer(PlayerSymbol playerSymbol)
+    public void RemovePlayerFromBoard(PlayerSymbol playerSymbol)
     {
         if (currentPlayer.playerSymbol == playerSymbol)
         {
+            Debug.Log("Changed to next player because player left game");
             currentPlayer = NextPlayer();
         }
 
         GamePlayer player = null;
-        foreach (var p in players)
+        foreach (var p in boardPlayers)
         {
             if (p.playerSymbol == playerSymbol)
             {
@@ -1042,7 +1045,8 @@ public struct Board
 
         if (player != null)
         {
-            players.Remove(player);
+            boardPlayers.Remove(player);
+            Debug.Log(player.playerSymbol + " removed from board");
         }
     }
 

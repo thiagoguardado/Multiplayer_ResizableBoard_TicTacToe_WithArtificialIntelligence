@@ -25,7 +25,7 @@ public class MyNetworkManager : NetworkManager {
     public NetworkPlayer currentPlayer;
     private int nextPlayerID = 0;
 
-    public bool isConnected { get; private set; }
+    public static bool isConnected { get; private set; }
     public bool lookingForMatches { get; private set; }
 
     private void Start()
@@ -41,6 +41,7 @@ public class MyNetworkManager : NetworkManager {
     {
         lookingForMatches = true;
         StartMatchMaker();
+        Debug.Log("start match maker");
     }
 
     public void ListMatchesOnInternet(NetworkMatch.DataResponseDelegate<List<MatchInfoSnapshot>> callback)
@@ -130,77 +131,100 @@ public class MyNetworkManager : NetworkManager {
 
     public override void OnServerConnect(NetworkConnection conn)
     {
-
-        currentMatch.AddPlayer(new NetworkPlayer(ChooseRandomNewPlayerSymbol(), nextPlayerID));
-        currentConnections.Add(conn, nextPlayerID);
-        nextPlayerID++;
+        bool clientCanConnect = (GameManager.GameState == GameState.Menu);
 
         base.OnServerConnect(conn);
 
-        NetworkGameLobbyView netView = GetComponent<NetworkGameLobbyView>();
-        if (netView != null)
+        if (clientCanConnect)
         {
-            netView.UpdateView();
-        }
+            currentMatch.AddPlayer(new NetworkPlayer(ChooseRandomNewPlayerSymbol(), nextPlayerID));
+            currentConnections.Add(conn, nextPlayerID);
+            nextPlayerID++;
 
-        if (GameManager.networkType == NetworkType.LAN)
-        {
-            StartCoroutine(RefreshBroadcastInfoLAN());
-            if (currentMatch.playersOnLobby.Length >= 4)
+            NetworkGameLobbyView netView = GetComponent<NetworkGameLobbyView>();
+            if (netView != null)
             {
-                //Stop broadcast
-                Discovery.MyStopBroadcast();
+                netView.UpdateView();
             }
-        } else if (GameManager.networkType == NetworkType.Internet)
-        {
-            //StartCoroutine(RefreshBroadcastInfoInternet());
-            //
-        }
 
-    }
-
-    public override void OnServerDisconnect(NetworkConnection conn)
-    {
-
-        // if in game, remove player from current match and change to next player
-        if (GameManager.GameState == GameState.GameStarted)
-        {
-            NetworkPlayer disconnectedPlayer = new NetworkPlayer();
-            for (int i = 0; i < currentMatch.playersOnLobby.Length; i++)
+            if (GameManager.networkType == NetworkType.LAN)
             {
-                if (currentMatch.playersOnLobby[i].playerID == currentConnections[conn])
+                StartCoroutine(RefreshBroadcastInfoLAN());
+                if (currentMatch.playersOnLobby.Length >= 4)
                 {
-                    disconnectedPlayer = currentMatch.playersOnLobby[i];
+                    //Stop broadcast
+                    Discovery.MyStopBroadcast();
+                }
+            }
+            else if (GameManager.networkType == NetworkType.Internet)
+            {
+                if (currentMatch.playersOnLobby.Length >= 4)
+                {
+                    //Stop broadcast
+                    ChangeMatchVisibility(false);
+                }
+            }
+        }
+        else
+        {
+            var networks = FindObjectsOfType<NetworkGameLobby>();
+            foreach (var net in networks)
+            {
+                if (net.isLocalPlayer)
+                {
+                    net.TargetForceDisconnect(conn);
                     break;
                 }
             }
-            
-            BoardManager.Instance.TriggerPlayerRemoval(disconnectedPlayer.playerSymbol);
+        }
+    }
 
+
+    public override void OnServerDisconnect(NetworkConnection conn)
+    {
+        if (currentConnections.ContainsKey(conn))
+        {
+
+            // if in game, remove player from current match and change to next player
+            if (GameManager.GameState == GameState.GameStarted)
+            {
+                NetworkPlayer disconnectedPlayer = new NetworkPlayer();
+                for (int i = 0; i < currentMatch.playersOnLobby.Length; i++)
+                {
+                    if (currentMatch.playersOnLobby[i].playerID == currentConnections[conn])
+                    {
+                        disconnectedPlayer = currentMatch.playersOnLobby[i];
+                        break;
+                    }
+                }
+
+                BoardManager.Instance.TriggerPlayerRemoval(disconnectedPlayer.playerSymbol);
+
+                if (GameManager.networkType == NetworkType.LAN)
+                {
+                    if (currentMatch.playersOnLobby.Length < 4)
+                    {
+                        //restart broadcast
+                        StartCoroutine(RefreshBroadcastInfoLAN());
+                    }
+                }
+                else if (GameManager.networkType == NetworkType.Internet)
+                {
+                    if (currentMatch.playersOnLobby.Length < 4)
+                    {
+                        //restart broadcast
+                        ChangeMatchVisibility(true);
+                    }
+                }
+
+            }
+
+            currentMatch.RemovePlayer(currentConnections[conn]);
+            currentConnections.Remove(conn);
+
+            base.OnServerDisconnect(conn);
 
         }
-        
-        currentMatch.RemovePlayer(currentConnections[conn]);
-        currentConnections.Remove(conn);
-
-        base.OnServerDisconnect(conn);
-
-        if (GameManager.networkType == NetworkType.LAN)
-        {
-            if (currentMatch.playersOnLobby.Length < 4)
-            {
-                //restart broadcast
-                StartCoroutine(RefreshBroadcastInfoLAN());
-            }
-        } else if (GameManager.networkType == NetworkType.Internet)
-        {
-            if (currentMatch.playersOnLobby.Length < 4)
-            {
-                //restart broadcast
-                //StartCoroutine(RefreshBroadcastInfoInternet());
-            }
-        }
-        
 
     }
 
@@ -213,14 +237,6 @@ public class MyNetworkManager : NetworkManager {
     }
 
 
-    private IEnumerator RefreshBroadcastInfoInternet()
-    {
-        StopMatchMaker();
-        yield return null;
-        StartMatchMaker();        
-        matchMaker.CreateMatch(NetworkMatchData.CreateMatchBroadcastData(currentMatch), 4, true, "", "", "", 0, 0, OnMatchCreate);
-    }
-
 
     public static void ClientDisconnectAll()
     {
@@ -228,6 +244,7 @@ public class MyNetworkManager : NetworkManager {
         singleton.StopHost();
         singleton.StopMatchMaker();
         Network.Disconnect();
+        isConnected = false;
     }
 
     public static void ServerDiscconectAll()
@@ -237,6 +254,7 @@ public class MyNetworkManager : NetworkManager {
         singleton.StopMatchMaker();
         Discovery.MyStopBroadcast();
         Network.Disconnect();
+        isConnected = false;
     }
 
     public PlayerSymbol ChooseRandomNewPlayerSymbol()
@@ -248,5 +266,25 @@ public class MyNetworkManager : NetworkManager {
         }
 
         return GameManager.FindDifferentPlayerSymbol(currentSymbols);
+    }
+
+    public void ChangeMatchVisibility(bool visible)
+    {
+        matchMaker.SetMatchAttributes(matchInfo.networkId, visible, 0, (success,extendedInfo) => { Debug.Log("set match attributes: " + success); });
+    }
+
+
+    public override void OnClientError(NetworkConnection conn, int errorCode)
+    {
+        base.OnClientError(conn, errorCode);
+
+        Debug.LogError("Client error: " + errorCode);
+    }
+
+    public override void OnServerError(NetworkConnection conn, int errorCode)
+    {
+        base.OnServerError(conn, errorCode);
+
+        Debug.LogError("Server error: " + errorCode);
     }
 }

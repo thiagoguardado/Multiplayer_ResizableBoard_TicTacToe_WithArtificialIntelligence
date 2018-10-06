@@ -94,6 +94,12 @@ public class NetworkGameLobby : NetworkBehaviour {
         mynetworkManager.currentPlayer.playerID = playerID;
     }
 
+    [TargetRpc]
+    public void TargetForceDisconnect(NetworkConnection target)
+    {
+        MyNetworkManager.ClientDisconnectAll();
+    }
+
     [ClientRpc]
     private void RpcAskPlayerForName()
     {
